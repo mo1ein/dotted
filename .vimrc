@@ -1,4 +1,4 @@
-"###########################################################################"
+"###########################################################################
 "                                    _
 "                             _   __(_)___ ___  __________
 "                            | | / / / __ `__ \/ ___/ ___/
@@ -31,7 +31,7 @@ colorscheme molokai
 "colorscheme dracula
 "packadd! dracula
 
-" molokai background trancparency
+" molokai background transparency
 hi Normal guibg=NONE ctermbg=NONE
 let g:rehash256 = 1
 let g:molokai_original = 1
