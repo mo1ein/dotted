@@ -20,8 +20,10 @@ set noswapfile
 set noerrorbells
 set encoding=utf8
 set clipboard=unnamed
-set clipboard=unnamedplus
+set clipboard=+unnamedplus
 
+" For farsi language
+set termbidi
 
 " Colorscheme
 colorscheme molokai
@@ -45,7 +47,7 @@ set tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 set number
 set relativenumber
 set ruler
-hi LineNr ctermfg=NONE  ctermbg=NONE ctermfg=blue
+hi LineNr ctermbg=NONE ctermfg=blue
 
 
 " Indent
@@ -58,8 +60,7 @@ set showmatch
 " Search
 set hlsearch
 set ignorecase
-hi Search ctermbg=015
-
+hi Search ctermbg=51
 
 " Highlight current line
 set cursorline
