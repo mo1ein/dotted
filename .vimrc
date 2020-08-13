@@ -22,17 +22,17 @@ set encoding=utf8
 set clipboard=unnamed
 set clipboard=+unnamedplus
 
-" For farsi language
+" For Persian language
 set termbidi
 
 " Colorscheme
-colorscheme molokai
-"colorscheme neodark
+"colorscheme molokai
+colorscheme neodark
 "colorscheme dracula
 "packadd! dracula
 
 " molokai background transparency
-hi Normal guibg=NONE ctermbg=NONE
+" hi Normal guibg=NONE ctermbg=NONE
 let g:rehash256 = 1
 let g:molokai_original = 1
 " for neodark transparency
@@ -78,7 +78,7 @@ if &term =~ '^screen'
 endif
 
 
-" YouCompleteMe
+" Colors in autocomplete
 let g:ycm_use_clangd = 0
 let g:ycm_confirm_extra_conf = 1
 hi Pmenu ctermfg=NONE ctermbg=236 cterm=NONE guifg=NONE guibg=#64666d gui=NONE
@@ -159,6 +159,17 @@ if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif
 
+
+" Deoplete
+let g:deoplete#enable_at_startup = 1
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+
+" vim markdown preview
+let vim_markdown_preview_browser='firefox'
+
+
 " Unicode symbols
 let g:airline_left_sep = '»'
 let g:airline_left_sep = '▶'
@@ -180,13 +191,15 @@ nnoremap <Down>  :resize +1<CR>
 nnoremap <Left>  :vertical resize -1<CR>
 nnoremap <Right> :vertical resize +1<CR>
 
+
 " Auto complete for ( , " , ' , [ , {
-inoremap        (  ()<Left>
-inoremap        "  ""<Left>
-inoremap        `  ``<Left>
-inoremap        '  ''<Left>
-inoremap        [  []<Left>
-inoremap      {  {}<Left>
+"inoremap        (  ()<Left>
+"inoremap        "  ""<Left>
+"inoremap        `  ``<Left>
+"inoremap        '  ''<Left>
+"inoremap        [  []<Left>
+"inoremap      {  {}<Left>
+
 
 " Switch Between Tabs (with F3 and F4)
 noremap <silent> #3 :tabprevious<CR>
@@ -195,6 +208,7 @@ noremap <silent> #4 :tabnext<CR>
 
 " Reload config from ~/.vimrc
 nnoremap jr :source $MYVIMRC<CR>
+
 
 "so important for run plugins :))
 execute pathogen#infect()
@@ -215,4 +229,17 @@ Plug 'tpope/vim-fugitive'
 Plug 'xuhdev/vim-latex-live-preview'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'KeitaNakamura/neodark.vim'
+Plug 'dhruvasagar/vim-zoom'
+Plug 'junegunn/vim-slash'
+Plug 'haya14busa/incsearch.vim'
+Plug 'iamcco/markdown-preview.vim'
+"Plug 'ycm-core/YouCompleteMe'
+
+"deoplete
+Plug 'Shougo/deoplete.nvim'
+Plug 'Shougo/deoplete-clangx'
+Plug 'roxma/nvim-yarp'
+Plug 'roxma/vim-hug-neovim-rpc'
+Plug 'deoplete-plugins/deoplete-jedi'
+
 call plug#end()
