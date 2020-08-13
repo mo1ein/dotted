@@ -1,0 +1,12 @@
+[user]
+	name = mo1ein
+	email = moeinn.com@gmail.com
+
+[core]
+	editor = vim
+
+[color]
+    ui = true
+
+[grep]
+    lineNumber=true
