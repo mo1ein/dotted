@@ -33,10 +33,10 @@ colorscheme neodark
 
 " molokai background transparency
 " hi Normal guibg=NONE ctermbg=NONE
-let g:rehash256 = 1
-let g:molokai_original = 1
+"let g:rehash256 = 1
+"let g:molokai_original = 1
 " for neodark transparency
-let g:neodark#terminal_transparent = 1
+"let g:neodark#terminal_transparent = 1
 
 
 " Tab size
@@ -193,12 +193,12 @@ nnoremap <Right> :vertical resize +1<CR>
 
 
 " Auto complete for ( , " , ' , [ , {
-"inoremap        (  ()<Left>
-"inoremap        "  ""<Left>
-"inoremap        `  ``<Left>
-"inoremap        '  ''<Left>
-"inoremap        [  []<Left>
-"inoremap      {  {}<Left>
+inoremap        (  ()<Left>
+inoremap        "  ""<Left>
+inoremap        `  ``<Left>
+inoremap        '  ''<Left>
+inoremap        [  []<Left>
+inoremap      {  {}<Left>
 
 
 " Switch Between Tabs (with F3 and F4)
@@ -236,10 +236,11 @@ Plug 'iamcco/markdown-preview.vim'
 "Plug 'ycm-core/YouCompleteMe'
 
 "deoplete
-Plug 'Shougo/deoplete.nvim'
-Plug 'Shougo/deoplete-clangx'
-Plug 'roxma/nvim-yarp'
-Plug 'roxma/vim-hug-neovim-rpc'
 Plug 'deoplete-plugins/deoplete-jedi'
+Plug 'roxma/vim-hug-neovim-rpc'
+Plug 'Shougo/deoplete-clangx'
+Plug 'Shougo/deoplete.nvim'
+Plug 'roxma/nvim-yarp'
 
+Plug 'davidhalter/jedi-vim'
 call plug#end()
