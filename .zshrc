@@ -1,5 +1,5 @@
 
-export ZSH="/home/moein/.oh-my-zsh"
+export ZSH="/home/$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
 #ZSH_THEME="agnosterme"
@@ -10,7 +10,7 @@ setopt correct
 ## Alias section
 alias vi="vim"
 alias df='df -h'
-alias top='bashtop'
+alias top='htop'
 
 # Color of man pages
 export LESS_TERMCAP_mb=$'\E[01;32m'
@@ -26,4 +26,5 @@ export VISUAL='vim'
 export EDITOR='vim'
 export PAGER='less'
 
+plugins=(git)
 source $ZSH/oh-my-zsh.sh
