@@ -170,6 +170,10 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 let vim_markdown_preview_browser='firefox'
 
 
+" Vimplayer
+let g:default_player = 'mocp'
+
+
 " Unicode symbols
 let g:airline_left_sep = '»'
 let g:airline_left_sep = '▶'
@@ -233,6 +237,7 @@ Plug 'dhruvasagar/vim-zoom'
 Plug 'junegunn/vim-slash'
 Plug 'haya14busa/incsearch.vim'
 Plug 'iamcco/markdown-preview.vim'
+Plug 'mo1ein/Vimplayer'
 "Plug 'ycm-core/YouCompleteMe'
 
 "deoplete
