@@ -173,6 +173,27 @@ let vim_markdown_preview_browser='firefox'
 " Vimplayer
 let g:default_player = 'mocp'
 
+" Ctrl + p  Toggle  play/pause
+nnoremap <C-p> :Pp<CR>
+
+" Ctrl + l  Next music
+nnoremap <C-l> :Pnext<CR>
+
+" Ctrl + k  Previous music
+nnoremap <C-k> :Prev<CR>
+
+" Ctrl + i  Current music info
+nnoremap <C-i> :Current<CR>
+
+" Ctrl + b  Toggle repeat
+nnoremap <C-b> :Repeat<CR>
+
+" Ctrl + s  Toggle shuffle
+nnoremap <C-s> :Shuffle<CR>
+
+" Ctrl + a  Toggle autonext
+nnoremap <C-a> :Autonext<CR>
+
 
 " Unicode symbols
 let g:airline_left_sep = '»'
