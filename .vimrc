@@ -185,8 +185,8 @@ nnoremap <C-k> :Prev<CR>
 " Ctrl + i  Current music info
 nnoremap <C-i> :Current<CR>
 
-" Ctrl + b  Toggle repeat
-nnoremap <C-b> :Repeat<CR>
+" Ctrl + x  Toggle repeat
+nnoremap <C-x> :Repeat<CR>
 
 " Ctrl + s  Toggle shuffle
 nnoremap <C-s> :Shuffle<CR>
