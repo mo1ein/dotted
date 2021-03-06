@@ -128,20 +128,28 @@ let g:ale_lint_on_enter = 1
 let g:ale_list_window_size = 5
 let g:airline#extensions#ale#enabled = 1
 let b:ale_warn_about_trailing_whitespace = 0
-
-let g:ale_linters = {
-  \ 'python': ['pycodestyle'],
-  \ 'c': ['clang'],
-  \'cpp': ['clang', 'g++']
-  \ }
-
-let g:ale_fixers = {
-  \ 'python': ['autopep8'],
-  \ '*': ['remove_trailing_lines', 'trim_whitespace']
-  \ }
-
 let g:ale_sign_error = '✘'
 let g:ale_sign_warning = "◉"
+let g:ale_linters = {
+    \ 'c': ['clang'],
+    \ 'cpp': ['clang', 'g++'],
+    \ 'python': ['flake8'],
+    \ 'javascript': ['eslint'],
+    \ 'vue': ['eslint']
+    \ }
+    "\ 'python': ['black'],
+    "\ 'javascript': ['prettier', 'eslint']
+
+let g:ale_fixers = {
+  \     'python': ['autopep8'],
+  \    'javascript': ['eslint'],
+  \    'typescript': ['prettier', 'tslint'],
+  \    'vue': ['eslint'],
+  \    'scss': ['prettier'],
+  \    'html': ['prettier'],
+  \    'reason': ['refmt'],
+  \     '*': ['remove_trailing_lines', 'trim_whitespace']
+  \ }
 
 hi SignColumn ctermbg=NONE
 highlight ALEErrorSign ctermfg=9 ctermbg=NONE
@@ -195,6 +203,50 @@ nnoremap <C-s> :Shuffle<CR>
 nnoremap <C-a> :Autonext<CR>
 
 
+" closetag
+
+" filenames like *.xml, *.html, *.xhtml, ...
+" These are the file extensions where this plugin is enabled.
+"
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
+
+" filenames like *.xml, *.xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filenames = '*.xhtml,*.jsx'
+
+" filetypes like xml, html, xhtml, ...
+" These are the file types where this plugin is enabled.
+"
+let g:closetag_filetypes = 'html,xhtml,phtml'
+
+" filetypes like xml, xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filetypes = 'xhtml,jsx'
+
+" integer value [0|1]
+" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
+"
+let g:closetag_emptyTags_caseSensitive = 1
+
+" dict
+" Disables auto-close if not in a "valid" region (based on filetype)
+"
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ }
+
+" Shortcut for closing tags, default is '>'
+"
+let g:closetag_shortcut = '>'
+
+" Add > at current position without closing the current tag, default is ''
+"
+let g:closetag_close_shortcut = '<leader>>'
+
+
 " Unicode symbols
 let g:airline_left_sep = '»'
 let g:airline_left_sep = '▶'
@@ -203,6 +255,7 @@ let g:airline_right_sep = '◀'
 
 
 " Key maps
+
 " Paste mode toggle with F2
 set pastetoggle=<F2>
 
@@ -216,57 +269,63 @@ nnoremap <Down>  :resize +1<CR>
 nnoremap <Left>  :vertical resize -1<CR>
 nnoremap <Right> :vertical resize +1<CR>
 
-
 " Auto complete for ( , " , ' , [ , {
-inoremap        (  ()<Left>
-inoremap        "  ""<Left>
-inoremap        `  ``<Left>
-inoremap        '  ''<Left>
-inoremap        [  []<Left>
-inoremap      {  {}<Left>
-
+"noremap        (  ()<Left>
+"noremap        "  ""<Left>
+"noremap        `  ``<Left>
+"noremap        '  ''<Left>
+"noremap        [  []<Left>
+"noremap      {  {}<Left>
 
 " Switch Between Tabs (with F3 and F4)
 noremap <silent> #3 :tabprevious<CR>
 noremap <silent> #4 :tabnext<CR>
 
-
 " Reload config from ~/.vimrc
-nnoremap jr :source $MYVIMRC<CR>
+"nnoremap jr :source $MYVIMRC<CR>
 
 
 "so important for run plugins :))
 execute pathogen#infect()
 
-
 " Plugins
 call plug#begin('~/.vim/plugged')
+
 " You can add every plugin here and install it.
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'ryanoasis/vim-devicons'
-Plug 'preservim/nerdtree'
 Plug 'dense-analysis/ale'
-Plug 'ap/vim-css-color'
+Plug 'preservim/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'Yggdroot/indentLine'
 Plug 'tpope/vim-fugitive'
-Plug 'xuhdev/vim-latex-live-preview'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'KeitaNakamura/neodark.vim'
 Plug 'dhruvasagar/vim-zoom'
 Plug 'junegunn/vim-slash'
 Plug 'haya14busa/incsearch.vim'
 Plug 'iamcco/markdown-preview.vim'
+Plug 'davidhalter/jedi-vim'
+Plug 'xuhdev/vim-latex-live-preview'
 Plug 'mo1ein/Vimplayer'
-"Plug 'ycm-core/YouCompleteMe'
 
-"deoplete
+" autocomplete (deoplete)
 Plug 'deoplete-plugins/deoplete-jedi'
 Plug 'roxma/vim-hug-neovim-rpc'
 Plug 'Shougo/deoplete-clangx'
 Plug 'Shougo/deoplete.nvim'
 Plug 'roxma/nvim-yarp'
+"Plug 'ycm-core/YouCompleteMe'
 
-Plug 'davidhalter/jedi-vim'
+" color/theme
+Plug 'KeitaNakamura/neodark.vim'
+Plug 'dracula/vim', { 'as': 'dracula' }
+
+" web development
+Plug 'mattn/emmet-vim'
+Plug 'ap/vim-css-color'
+Plug 'tpope/vim-surround'
+Plug 'alvan/vim-closetag'
+Plug 'jiangmiao/auto-pairs'
+Plug 'turbio/bracey.vim', {'do': 'npm install --prefix server'}
+
 call plug#end()
