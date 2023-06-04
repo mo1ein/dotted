@@ -178,6 +178,13 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 let vim_markdown_preview_browser='firefox'
 
 
+" Vim-commentary
+
+" Ctrl + /   Toggle  comment/uncomment
+nnoremap <C-_> :Commentary<CR>
+nnoremap <C-_> :Commentary<CR>
+
+
 " Vimplayer
 let g:default_player = 'mocp'
 
@@ -315,10 +322,13 @@ Plug 'Shougo/deoplete-clangx'
 Plug 'Shougo/deoplete.nvim'
 Plug 'roxma/nvim-yarp'
 "Plug 'ycm-core/YouCompleteMe'
+Plug 'deoplete-plugins/deoplete-go', { 'do': 'make' }
+"Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries'  }
 
 " color/theme
 Plug 'KeitaNakamura/neodark.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'ErichDonGubler/vim-sublime-monokai'
 
 " web development
 Plug 'mattn/emmet-vim'
@@ -327,5 +337,10 @@ Plug 'tpope/vim-surround'
 Plug 'alvan/vim-closetag'
 Plug 'jiangmiao/auto-pairs'
 Plug 'turbio/bracey.vim', {'do': 'npm install --prefix server'}
+
+" other
+Plug 'davidhalter/jedi-vim'
+Plug 'gabrielsimoes/cfparser.vim'
+Plug 'tpope/vim-commentary'
 
 call plug#end()
