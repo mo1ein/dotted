@@ -7,7 +7,7 @@ git clone https://github.com/mo1ein/My-dotfiles.git
 ```
 
 * ## Vim
-  First , Install [Vim-plug](https://github.com/junegunn/vim-plug) then :
+  First , Install [Vim-plug](https://github.com/junegunn/vim-plug) then:
   ```
   cp My-dotfiles/.vimrc ~/
   ```
@@ -17,10 +17,23 @@ git clone https://github.com/mo1ein/My-dotfiles.git
   ```
   cp My-dotfiles/.zshrc ~/
   ```
+
 * ## tmux
   ```
   cp My-dotfiles/.tmux.conf ~/
   ```
+
+* ## git
+  ```
+  cp My-dotfiles/.config/git ~/.config/
+  ```
+  And
+  ```
+  cp My-dotfiles/.gitconfig ~/
+  ```
+
+* ## i3
+  Coming soon...
 
 * ## MOC
   ```
