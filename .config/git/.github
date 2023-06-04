@@ -1,0 +1,16 @@
+[user]
+    name = moein
+    email = moeinn.com@gmail.com
+    signingkey = C9CBD7F20BD2DD9AA85F36953DDAC270F0CEC7D1
+
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
+[core]
+    editor = vim
+
+[color]
+    ui = true
+
+[grep]
+    lineNumber = true

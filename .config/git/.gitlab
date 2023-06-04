@@ -1,0 +1,12 @@
+[user]
+    name = Moein
+    email = m.halvayi.narvanventures.com
+
+[core]
+    editor = vim
+
+[color]
+    ui = true
+
+[grep]
+    lineNumber = true

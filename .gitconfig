@@ -1,12 +1,7 @@
-[user]
-	name = mo1ein
-	email = moeinn.com@gmail.com
+[init]
+    defaultBranch = master
 
-[core]
-	editor = vim
-
-[color]
-    ui = true
-
-[grep]
-    lineNumber=true
+[includeIf "gitdir:~/projects/"]
+    path = ~/.config/git/.github
+[includeIf "gitdir:~/projects/n/"]
+    path = ~/.config/git/.gitlab
