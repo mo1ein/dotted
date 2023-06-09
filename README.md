@@ -35,7 +35,6 @@ git clone https://github.com/mo1ein/My-dotfiles.git
 * ## i3
   ```
   cp My-dotfiles/.config/i3 My-dotfiles/.config/i3status ~/.config/
-
   ```
 
 * ## MOC
