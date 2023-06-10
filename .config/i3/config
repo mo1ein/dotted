@@ -187,6 +187,3 @@ client.placeholder      #282A36 #282A36 #F8F8F2 #282A36   #282A36
 client.background       #F8F8F2
 
 # audio control...
-
-# Keyboard Layouts
-exec_always "setxkbmap -model pc104 -layout us,ir -option 'grp:lalt_lshift_toggle'"
