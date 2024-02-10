@@ -314,6 +314,7 @@ Plug 'iamcco/markdown-preview.vim'
 Plug 'davidhalter/jedi-vim'
 Plug 'xuhdev/vim-latex-live-preview'
 Plug 'mo1ein/Vimplayer'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 
 " autocomplete (deoplete)
 Plug 'deoplete-plugins/deoplete-jedi'
