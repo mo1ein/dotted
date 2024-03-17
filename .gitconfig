@@ -3,5 +3,6 @@
 
 [includeIf "gitdir:~/projects/"]
     path = ~/.config/git/.github
-[includeIf "gitdir:~/projects/n/"]
+
+[includeIf "gitdir:~/projects/o/"]
     path = ~/.config/git/.gitlab
