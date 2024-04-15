@@ -11,6 +11,11 @@ git clone https://github.com/mo1ein/My-dotfiles.git
   ```
   cp My-dotfiles/.vimrc ~/
   ```
+  For show icons install this font: https://www.nerdfonts.com/font-downloads
+  ```
+  sudo cp *.ttf /usr/share/fonts/
+  sudo fc-cache -fv
+  ```
   Go to vim and type : ``` :PlugInstall```to download plugins :)
 
 * ## Zsh
