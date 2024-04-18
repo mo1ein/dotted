@@ -180,9 +180,8 @@ let vim_markdown_preview_browser='firefox'
 
 " Vim-commentary
 
-" Ctrl + /   Toggle  comment/uncomment
-nnoremap <C-_> :Commentary<CR>
-nnoremap <C-_> :Commentary<CR>
+" Ctrl + / Toggle comment/uncomment
+map <C-_> :Commentary<CR>
 
 
 " Vimplayer
@@ -198,7 +197,7 @@ nnoremap <C-l> :Pnext<CR>
 nnoremap <C-k> :Prev<CR>
 
 " Ctrl + i  Current music info
-nnoremap <C-i> :Current<CR>
+" nnoremap <C-i> :Current<CR>
 
 " Ctrl + x  Toggle repeat
 nnoremap <C-x> :Repeat<CR>
@@ -283,6 +282,14 @@ nnoremap <Right> :vertical resize +1<CR>
 "noremap        '  ''<Left>
 "noremap        [  []<Left>
 "noremap      {  {}<Left>
+
+
+" buffers & tabs
+" this is enable to switch buffers when file is not saved
+set hidden
+" this can be conflict with Ctrl+Tab and Ctrl+i
+" https://unix.stackexchange.com/questions/563469/conflict-ctrl-i-with-tab-in-normal-mode
+nnoremap <C-i> :b#<CR>
 
 " Switch Between Tabs (with F3 and F4)
 noremap <silent> #3 :tabprevious<CR>
