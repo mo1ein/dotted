@@ -1,15 +1,16 @@
-# My-dotfiles
+# dotted
 ### All my config files
 ## Usage
 
 ```
-git clone https://github.com/mo1ein/My-dotfiles.git
+git clone https://github.com/mo1ein/dotted.git
+cd dotted
 ```
 
 * ## Vim
   First , Install [Vim-plug](https://github.com/junegunn/vim-plug) then:
   ```
-  cp My-dotfiles/.vimrc ~/
+  cp .vimrc ~/
   ```
   For show icons install this font: https://www.nerdfonts.com/font-downloads
   ```
@@ -20,30 +21,30 @@ git clone https://github.com/mo1ein/My-dotfiles.git
 
 * ## Zsh
   ```
-  cp My-dotfiles/.zshrc ~/
+  cp .zshrc ~/
   ```
 
 * ## tmux
   ```
-  cp My-dotfiles/.tmux.conf ~/
+  cp .tmux.conf ~/
   ```
 
 * ## git
   ```
-  cp My-dotfiles/.config/git ~/.config/
+  cp .config/git ~/.config/
   ```
   And
   ```
-  cp My-dotfiles/.gitconfig ~/
+  cp .gitconfig ~/
   ```
 
 * ## i3
   ```
-  cp My-dotfiles/.config/i3 My-dotfiles/.config/i3status ~/.config/
+  cp -r .config/i3 .config/i3status ~/.config/
   ```
 
 * ## MOC
   ```
-  cp My-dotfiles/config ~/.moc/
+  cp config ~/.moc/
   ```
 ![alt text](https://github.com/mo1ein/My-dotfiles/blob/master/pic.png)
