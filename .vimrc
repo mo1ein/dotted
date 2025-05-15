@@ -101,7 +101,7 @@ let g:nerdtreefileextensionhighlightfullname = 1
 " Open file in new tab with ctrl + t
 let NERDTreeMapOpenInTab='<c-t>'
 let g:NERDTreeWinPos = "right"
-let g:NERDTreeIndicatorMapCustom = {
+let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ "Modified"  : "✹",
     \ "Staged"    : "✚",
     \ "Untracked" : "✭",
