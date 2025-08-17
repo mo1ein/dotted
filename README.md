@@ -7,10 +7,15 @@ git clone https://github.com/mo1ein/dotted.git
 cd dotted
 ```
 
+* ## Neovim
+    Finally I switched to neovim. :)
+
 * ## Vim
   First , Install [Vim-plug](https://github.com/junegunn/vim-plug) then:
   ```
   cp .vimrc ~/
+  mkdir -p ~/.vim/autoload && \
+  curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
   ```
   For show icons install this font: https://www.nerdfonts.com/font-downloads
   ```
