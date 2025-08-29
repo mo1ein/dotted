@@ -52,4 +52,3 @@ cd dotted
   ```
   cp config ~/.moc/
   ```
-![alt text](https://github.com/mo1ein/My-dotfiles/blob/master/pic.png)
