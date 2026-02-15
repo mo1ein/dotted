@@ -1,54 +1,27 @@
 # dotted
-### All my config files
-## Usage
+All my . files managed in one place using the [GNU Stow](https://www.gnu.org/software/stow/) pattern and an automated installer.
+Each configuration lives in its own directory (a “stow package”) and is symlinked into `$HOME`, making it easy to manage, version, and reproduce my environment.
+
+This repository acts as a single source of truth, allowing me to sync and bootstrap the same setup across multiple machines by changing and maintaining just one source.
+
+## Installation
 
 ```
 git clone https://github.com/mo1ein/dotted.git
 cd dotted
 ```
 
-* ## Neovim
-    Finally I switched to neovim. :)
+```
+chmod +x install.sh
+./install.sh
+```
 
-* ## Vim
-  First , Install [Vim-plug](https://github.com/junegunn/vim-plug) then:
-  ```
-  cp .vimrc ~/
-  mkdir -p ~/.vim/autoload && \
-  curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-  ```
-  For show icons install this font: https://www.nerdfonts.com/font-downloads
-  ```
-  sudo cp *.ttf /usr/share/fonts/
-  sudo fc-cache -fv
-  ```
-  Go to vim and type : ``` :PlugInstall```to download plugins :)
+> [!NOTE]
+> Existing dotfiles are automatically backed up before creating symlinks to the new configuration files.
 
-* ## Zsh
-  ```
-  cp .zshrc ~/
-  ```
+Or if you want to install OS packages:
 
-* ## tmux
-  ```
-  cp .tmux.conf ~/
-  ```
-
-* ## git
-  ```
-  cp .config/git ~/.config/
-  ```
-  And
-  ```
-  cp .gitconfig ~/
-  ```
-
-* ## i3
-  ```
-  cp -r .config/i3 .config/i3status ~/.config/
-  ```
-
-* ## MOC
-  ```
-  cp config ~/.moc/
-  ```
+```
+./install.sh --install-pkgs
+```
+easy peasy lemon squeezy!
