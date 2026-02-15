@@ -23,5 +23,5 @@ alias top='htop'
 ENABLE_CORRECTION="true"
 DISABLE_AUTO_UPDATE="true"
 
-plugins=(git colored-man-pages)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 source $ZSH/oh-my-zsh.sh
