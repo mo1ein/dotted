@@ -7,6 +7,7 @@ git
 gnupg
 htop
 fzf
+tree
 
 # Editors
 vim
@@ -28,4 +29,5 @@ ipython3
 
 # Other
 vlc
+unrar
 
