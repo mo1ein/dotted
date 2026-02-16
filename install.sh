@@ -10,8 +10,6 @@ TARGET="$HOME"
 PACKAGES_FILE="$DOTFILES_DIR/packages.txt"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$TIMESTAMP"
-
-DRY_RUN=false
 ONLY_PKGS=false
 
 RED='\033[0;31m' 
@@ -84,6 +82,34 @@ install_packages() {
 }
 
 
+install_oh_my_zsh() {
+    if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+        log "Installing Oh My Zsh..."
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        chsh -s $(which zsh)
+    else
+        log "Oh My Zsh is already installed."
+    fi
+}
+
+
+install_gogh() {
+    if [[ ! -d "$HOME/.gogh" ]]; then
+        echo "Installing Gogh..."
+        local tmp_dir
+        tmp_dir="$(mktemp -d)"
+        git clone https://github.com/Gogh-Co/Gogh.git "$tmp_dir/gogh"
+        export TERMINAL="${TERMINAL:-gnome-terminal}"
+        for theme in "$tmp_dir/gogh/installs"/*.sh; do
+            echo "→ $(basename "$theme")"
+            bash "$theme"
+        done
+    else
+        echo "Gogh is already installed."
+    fi
+}
+
+
 collect_dirs() {
     # find config dirs except .git files
     find . -mindepth 3 -maxdepth 3 -print | grep -v '/\.git/'
@@ -136,23 +162,26 @@ stow_all() {
 }
 
 
-# --------- Flags ---------
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --install-pkgs|-i) ONLY_PKGS=true; shift ;;
-    *) error "Unknown option: $1"; exit 1 ;;
-  esac
-done
-
-
 # --------- main ---------
 
-if ! $ONLY_PKGS; then
-    backup_dotfiles
-    stow_all
-else
-    install_packages
-fi
+main () {
+    # --------- Flags ---------
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --install-pkgs|-i) ONLY_PKGS=true; shift ;;
+        *) error "Unknown option: $1"; exit 1 ;;
+      esac
+    done
 
-log "Done."
+    if ! $ONLY_PKGS; then
+        backup_dotfiles
+        stow_all
+    else
+        install_packages
+        install_oh_my_zsh
+        install_gogh
+    fi
+    log "Done."
+}
+
+main "$@"
