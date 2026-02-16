@@ -1,10 +1,13 @@
 [user]
     name = moein
     email = moeinn.com@gmail.com
-    signingkey = CD0DC82B85720F79
+    signingkey = 31C9C084C3F580EB
 
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
+
+[commit]
+    gpgsign = true
 
 [core]
     editor = vim
