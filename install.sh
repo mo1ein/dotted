@@ -93,6 +93,17 @@ install_oh_my_zsh() {
 }
 
 
+install_oh_my_zsh_plugins() {
+    # autosuggestions
+    git clone https://github.com/zsh-users/zsh-autosuggestions \
+	  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+    # syntax highlighting
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting \
+	  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+}
+
+
 install_gogh() {
     if [[ ! -d "$HOME/.gogh" ]]; then
         echo "Installing Gogh..."
@@ -205,6 +216,7 @@ main () {
     else
         install_packages
         install_oh_my_zsh
+	install_oh_my_zsh_plugins
         install_gogh
 	install_docker_on_deb
     fi
@@ -212,5 +224,4 @@ main () {
 }
 
 main "$@"
-
 
