@@ -108,6 +108,32 @@ install_gogh() {
         echo "Gogh is already installed."
     fi
 }
+install_docker_on_deb() {
+    # Try to remove old packages (ignore failures)
+    sudo apt remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc || true
+
+    # Add Docker's official GPG key and repo
+    sudo apt update
+    sudo apt install -y ca-certificates curl
+
+    # create keyrings dir
+    sudo install -m 0755 -d /etc/apt/keyrings
+
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources (here-doc delimiter must start at column 0)
+    sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<'EOF'
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
 
 
 collect_dirs() {
@@ -180,8 +206,11 @@ main () {
         install_packages
         install_oh_my_zsh
         install_gogh
+	install_docker_on_deb
     fi
     log "Done."
 }
 
 main "$@"
+
+
