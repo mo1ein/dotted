@@ -7,11 +7,19 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "agent": {
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-4o",
+    },
+    "favorite_models": [],
+    "model_parameters": [],
+  },
   "autosave": "on_focus_change",
   "session": {
     "trust_all_worktrees": true,
   },
-  "vim_mode": false,
+  "vim_mode": true,
   "base_keymap": "JetBrains",
   "ui_font_size": 16,
   "buffer_font_size": 15,

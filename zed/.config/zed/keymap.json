@@ -17,7 +17,13 @@
   {
     "context": "Editor && vim_mode == insert",
     "bindings": {
-        "j k": "vim::NormalBefore"
+      "j k": "vim::NormalBefore",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "space f f": "file_finder::Toggle",
     },
   },
 ]
