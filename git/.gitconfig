@@ -2,7 +2,7 @@
     defaultBranch = master
 
 [includeIf "gitdir:~/projects/"]
-    path = ~/.config/git/.github/0xmoein
+    path = ~/.config/git/.github/moein
 
 [includeIf "gitdir:~/projects/w/"]
     path = ~/.config/git/.gitlab
