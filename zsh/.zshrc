@@ -25,3 +25,5 @@ DISABLE_AUTO_UPDATE="true"
 
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 source $ZSH/oh-my-zsh.sh
+export PATH="$HOME/.local/bin:$PATH"
+
