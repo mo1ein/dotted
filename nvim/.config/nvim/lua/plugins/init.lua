@@ -223,14 +223,35 @@ return {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
+
   {
     "rmagatti/auto-session",
     config = function()
       require("auto-session").setup {}
     end,
   },
-}
 
+  {
+    "lervag/vimtex",
+    dir = "/home/moein/.local/share/nvim/lazy/vimtex/",
+    lazy = false,          -- load immediately for .tex files
+    config = function()
+        vim.g.vimtex_view_method = "zathura"   -- or zathura,  "evince", "okular"
+        vim.g.vimtex_compiler_method = "latexmk"
+        vim.g.vimtex_compiler_latexmk = {
+            continuous = 1,
+            options = {
+                "-pdf",
+                "-interaction=nonstopmode",
+                "-synctex=1",
+                "-pvc",      -- 🔥 live: recompile on every save
+            },
+        }
+        -- Disable continuous preview if you want manual compilation
+        -- vim.g.vimtex_compiler_latexmk = { continuous = 1 }
+    end,
+  }
+}
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
 
