@@ -251,6 +251,25 @@ return {
             -- Disable continuous preview if you want manual compilation
             -- vim.g.vimtex_compiler_latexmk = { continuous = 1 }
         end,
+    },
+    {
+        'cameron-wags/rainbow_csv.nvim',
+        config = true,
+        ft = {
+            'csv',
+            'tsv',
+            'csv_semicolon',
+            'csv_whitespace',
+            'csv_pipe',
+            'rfc_csv',
+            'rfc_semicolon'
+        },
+        cmd = {
+            'RainbowDelim',
+            'RainbowDelimSimple',
+            'RainbowDelimQuoted',
+            'RainbowMultiDelim'
+        }
     }
 }
 -- test new blink
