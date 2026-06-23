@@ -108,26 +108,25 @@ map("n", "<leader>gt", "<cmd>FzfLua git_status<CR>", { desc = "fzf-lua git statu
 ---- Run current file based on filetype (extension or detected syntax)
 local function run_file()
     local ft = vim.bo.filetype
-    local filename = vim.fn.expand("%")
+    local filename = vim.fn.expand "%"
     if filename == "" then
-        print("No file name to run")
+        print "No file name to run"
         return
     end
 
     -- Save the file before running (optional but recommended)
-    vim.cmd("write")
+    vim.cmd "write"
 
     if ft == "markdown" then
-        if vim.fn.exists(":MarkdownPreview") == 2 then
-            vim.cmd("MarkdownPreview")
+        if vim.fn.exists ":MarkdownPreview" == 2 then
+            vim.cmd "MarkdownPreview"
         end
     elseif ft == "go" then
-        if vim.fn.exists(":GoRun") == 2 then
-            vim.cmd("GoRun")
+        if vim.fn.exists ":GoRun" == 2 then
+            vim.cmd "GoRun"
         else
-            vim.cmd("!go run %")
+            vim.cmd "!go run %"
         end
-
     elseif ft == "python" then
         -- first check uv for
         local function is_uv_project()
@@ -138,36 +137,29 @@ local function run_file()
         end
         local runner = is_uv_project() and "!uv run %" or "!python %"
         vim.cmd(runner)
-
     elseif ft == "tex" then
         -- todo: add vimtexView
         -- Prefer VimtexCompile if you use vimtex, else fallback to latexmk
-        if vim.fn.exists(":VimtexCompile") == 2 then
-            vim.cmd("VimtexCompile")
+        if vim.fn.exists ":VimtexCompile" == 2 then
+            vim.cmd "VimtexCompile"
         else
-            vim.cmd("!latexmk -pdf -interaction=nonstopmode %")
+            vim.cmd "!latexmk -pdf -interaction=nonstopmode %"
         end
-
     elseif ft == "sh" or ft == "bash" or ft == "zsh" then
-        vim.cmd("!bash %")
-
+        vim.cmd "!bash %"
     elseif ft == "lua" then
-        vim.cmd("!lua %")
-
+        vim.cmd "!lua %"
     elseif ft == "javascript" or ft == "typescript" then
-        vim.cmd("!node %")
-
+        vim.cmd "!node %"
     elseif ft == "rust" then
         -- Assumes cargo project; otherwise use rustc
-        vim.cmd("!cargo run")
-
+        vim.cmd "!cargo run"
     elseif ft == "c" then
         -- Simple compile+run (adjust compiler flags as needed)
-        local out = vim.fn.expand("%:r") -- basename without extension
+        local out = vim.fn.expand "%:r" -- basename without extension
         vim.cmd("!gcc " .. filename .. " -o " .. out .. " && ./" .. out)
-
     elseif ft == "cpp" then
-        local out = vim.fn.expand("%:r")
+        local out = vim.fn.expand "%:r"
         vim.cmd("!g++ " .. filename .. " -o " .. out .. " && ./" .. out)
     else
         print("No run command defined for filetype: " .. ft)

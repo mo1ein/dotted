@@ -30,7 +30,7 @@ return {
 
     {
         "lukas-reineke/indent-blankline.nvim",
-        event = "User FilePost",
+        event = "VeryLazy",
         opts = {
             indent = { char = "│", highlight = "IblChar" },
             scope = { char = "│", highlight = "IblScopeChar" },
@@ -68,9 +68,10 @@ return {
     -- formatting!
     {
         "stevearc/conform.nvim",
-        opts = {
-            formatters_by_ft = { lua = { "stylua" } },
-        },
+        event = 'BufWritePre',
+        opts = function()
+            return require("configs.conform")
+        end
     },
 
     -- git stuff
@@ -153,9 +154,6 @@ return {
         opts = function()
             return require "configs.treesitter"
         end,
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup(opts)
-        end,
     },
 
     {
@@ -214,9 +212,9 @@ return {
     -- markdown-preview
     {
         "iamcco/markdown-preview.nvim",
+        build = function() vim.fn["mkdp#util#install"]() end,
         cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
         ft = { "markdown" },
-        build = function() vim.fn["mkdp#util#install"]() end,
     },
 
     -- statusline
@@ -270,6 +268,12 @@ return {
             'RainbowDelimQuoted',
             'RainbowMultiDelim'
         }
+    },
+    {
+        "nvzone/typr",
+        dependencies = "nvzone/volt",
+        opts = {},
+        cmd = { "Typr", "TyprStats" },
     }
 }
 -- test new blink

@@ -4,12 +4,21 @@ pcall(function()
 end)
 
 return {
-  ensure_installed = { "lua", "luadoc", "printf", "vim", "vimdoc" },
+  ensure_installed = {
+    "lua",
+    "luadoc",
+    "vim",
+    "vimdoc",
+    "markdown",
+    "markdown_inline",
+  },
 
   highlight = {
     enable = true,
     use_languagetree = true,
   },
 
-  indent = { enable = true },
+  indent = {
+    enable = true,
+  },
 }
