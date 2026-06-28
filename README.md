@@ -25,7 +25,7 @@ Or if you want to install OS packages:
 ./install.sh --install-pkgs
 ```
 
-And If you want restore backup
+And If you want to restore backup:
 
 ```
 ./install.sh --restore
