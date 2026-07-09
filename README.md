@@ -7,7 +7,7 @@ Each configuration lives in its own directory (a “stow package”) and is syml
 This repository acts as a single source of truth, allowing me to sync and bootstrap the same setup across multiple machines by changing and maintaining just one source.
 
 <p align="center">
-  <img src="./dotted.png" width="450" height="450" />
+  <img src="./dotted.png" width="500" height="450" />
 </p>
 
 ## Installation
