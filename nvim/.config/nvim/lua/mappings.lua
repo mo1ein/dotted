@@ -88,13 +88,62 @@ end, { desc = "whichkey query lookup" })
 
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
+map("v", "jk", "<ESC>", { desc = "exit visual mode" })
 
 -- fzf-lua mappings
 map("n", "<leader>fg", "<cmd>FzfLua live_grep<CR>", { desc = "fzf-lua live grep" })
 map("n", "<leader>ff", "<cmd>FzfLua files<CR>", { desc = "fzf-lua find files" })
 map("n", "<leader>fz", "<cmd>FzfLua grep_curbuf<CR>", { desc = "fzf-lua find in current buffer" })
-map("n", "<leader>gl", "<cmd>FzfLua git_commits<CR>", { desc = "fzf-lua git commits" })
+map("n", "<leader>gc", "<cmd>FzfLua git_commits<CR>", { desc = "fzf-lua git commits" })
 map("n", "<leader>gt", "<cmd>FzfLua git_status<CR>", { desc = "fzf-lua git status" })
+
+-- command palette (immediate execution, no preview)
+map("n", "<leader>p", function()
+  local ok, fzf = pcall(require, "fzf-lua")
+  if not ok then return end
+  fzf.commands({
+    actions = {
+      ["enter"] = function(selected)
+        if selected and #selected > 0 then
+          vim.cmd(selected[1])
+        end
+      end,
+    },
+  })
+end, { desc = "command palette" })
+
+-- search & replace (defined in plugins/init.lua via keys)
+
+-- debugging
+map("n", "<leader>dc", function() require("dap").continue() end, { desc = "DAP: continue" })
+map("n", "<leader>db", function() require("dap").toggle_breakpoint() end, { desc = "DAP: toggle breakpoint" })
+map("n", "<leader>do", function() require("dap").step_over() end, { desc = "DAP: step over" })
+map("n", "<leader>di", function() require("dap").step_into() end, { desc = "DAP: step into" })
+map("n", "<leader>dO", function() require("dap").step_out() end, { desc = "DAP: step out" })
+map("n", "<leader>dr", function() require("dap").repl.toggle() end, { desc = "DAP: toggle repl" })
+map("n", "<leader>dl", function() require("dap").run_last() end, { desc = "DAP: run last" })
+map("n", "<leader>du", function() require("dapui").toggle() end, { desc = "DAP: toggle UI" })
+map("n", "<leader>dx", function() require("dap").terminate() end, { desc = "DAP: terminate" })
+
+-- go development
+map("n", "<leader>gg", "<cmd>GoGenerate<CR>", { desc = "go: generate" })
+map("n", "<leader>gf", "<cmd>GoFillStruct<CR>", { desc = "go: fill struct" })
+
+-- pane zoom (maximize/restore current split)
+local zoom_state = {}
+map("n", "<leader>z", function()
+  local win = vim.api.nvim_get_current_win()
+  if zoom_state[win] then
+    vim.cmd(zoom_state[win])
+    zoom_state[win] = nil
+  else
+    zoom_state[win] = vim.api.nvim_win_call(win, function()
+      return vim.fn.winrestcmd()
+    end)
+    vim.cmd("wincmd |")
+    vim.cmd("wincmd _")
+  end
+end, { desc = "toggle pane zoom" })
 
 -- vim-go
 -- map("n", "<leader>gr", "<cmd>GoRun<CR>",{desc="go run"})

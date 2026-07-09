@@ -8,6 +8,7 @@ gnupg
 htop
 fzf
 tree
+ripgrep
 
 # Editors
 vim

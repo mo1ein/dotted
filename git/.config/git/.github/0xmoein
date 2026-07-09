@@ -3,14 +3,14 @@
     email = moeinn.com@gmail.com
     signingkey = BDB780A4237A1097
 
+[core]
+    editor = nvim
+
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
 
 [commit]
     gpgsign = true
-
-[core]
-    editor = vim
 
 [color]
     ui = true
