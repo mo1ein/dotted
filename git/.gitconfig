@@ -10,4 +10,8 @@
 	editor = nvim
 
 [commit]
-	gpgsign = false
+	gpgsign = true
+[user]
+	signingkey = A5BD212CC958843249699D0831C9C084C3F580EB
+[gpg]
+	program = gpg
