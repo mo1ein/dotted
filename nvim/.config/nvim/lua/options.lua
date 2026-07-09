@@ -32,8 +32,6 @@ o.ruler = false
 -- disable nvim intro
 opt.shortmess:append "sI"
 
-o.selection = "exclusive"
-
 o.signcolumn = "yes"
 o.splitbelow = true
 o.splitright = true
@@ -63,4 +61,3 @@ g.go_lint_mode = "off"
 g.go_lint_autosave = 0
 g.go_fmt_autosave = 0
 g.go_metalinter_enabled = {}
-
