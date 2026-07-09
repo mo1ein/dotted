@@ -75,7 +75,6 @@ M.on_attach = function(_, bufnr)
   -- Code actions & rename  (kept nvchad renamer; dropped duplicate native map)
   map("n", "<leader>ca", vim.lsp.buf.code_action,         opts "Code actions")
   map("n", "<leader>rn", require("nvchad.lsp.renamer"),   opts "Rename")
-  -- map("n", "<leader>rn", vim.lsp.buf.rename, opts "Rename symbol")
 
   -- Hover
   map("n", "K", function()
@@ -85,23 +84,6 @@ M.on_attach = function(_, bufnr)
   -- LSP management
   map("n", "<leader>cI", "<cmd>LspInfo<CR>",    opts "LSP info")
   map("n", "<leader>vR", "<cmd>LspRestart<CR>", opts "Restart LSP")
-
-  -- Format  –  filetype-aware so the filter makes sense on every buffer
-  map("n", "<leader>fm", function()
-    local ft = vim.bo[bufnr].filetype
-    local filter = nil
-
-    if ft == "python" then
-      -- Prefer Ruff; fall back to any formatter if Ruff isn't attached
-      local clients = vim.lsp.get_clients({ bufnr = bufnr })
-      local has_ruff = vim.iter(clients):any(function(c) return c.name == "ruff" end)
-      if has_ruff then
-        filter = function(c) return c.name == "ruff" end
-      end
-    end
-
-    vim.lsp.buf.format({ async = true, filter = filter })
-  end, opts "Format buffer")
 end
 
 -- ---------------------------------------------------------------------------

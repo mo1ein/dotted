@@ -17,6 +17,7 @@ return {
     "gopls",
     "ruff",
     "pyright",
+    "stylua",
   },
   automatic_installation = true,
   max_concurrent_installers = 10,

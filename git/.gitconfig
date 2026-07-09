@@ -6,3 +6,8 @@
 
 [includeIf "gitdir:~/projects/w/"]
     path = ~/.config/git/.gitlab
+[core]
+	editor = nvim
+
+[commit]
+	gpgsign = false

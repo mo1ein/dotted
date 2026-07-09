@@ -3,7 +3,7 @@
     email = moeinn.com@gmail.com
 
 [core]
-    editor = vim
+    editor = nvim
 
 [color]
     ui = true
