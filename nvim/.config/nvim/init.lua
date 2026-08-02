@@ -115,15 +115,27 @@ require("lazy").setup({
 }, lazy_config)
 
 require "options"
+
 vim.schedule(function()
   require "mappings"
 end)
+
+local function set_transparent()
+  local groups = {
+    "Normal", "NormalNC",
+    "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeCursorLine", "NvimTreeWinSeparator",
+  }
+  for _, g in ipairs(groups) do
+    vim.api.nvim_set_hl(0, g, { bg = "NONE" })
+  end
+end
 
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
     vim.schedule(function()
       apply()
+      set_transparent()
     end)
   end,
 })
@@ -133,6 +145,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     if vim.g.colors_name ~= "jb" then
       apply()
     end
+    set_transparent()
   end,
 })
 
@@ -140,7 +153,10 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "FilePost",
   once = true,
   callback = function()
-    vim.schedule(apply)
+    vim.schedule(function()
+      apply()
+      set_transparent()
+    end)
   end,
 })
 
@@ -149,5 +165,13 @@ vim.api.nvim_create_autocmd("User", {
   once = true,
   callback = function()
     apply()
+    set_transparent()
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "NvimTree",
+  callback = function()
+    set_transparent()
   end,
 })

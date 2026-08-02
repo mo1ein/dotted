@@ -3,6 +3,9 @@ return {
     "nickkadutskyi/jb.nvim",
     lazy = false,
     priority = 1000,
+    opts = {
+      transparent = true,
+    },
   },
 
   "nvim-lua/plenary.nvim",

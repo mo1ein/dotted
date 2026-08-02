@@ -17,6 +17,7 @@ neovim
 # Shell/Terminal
 zsh
 tmux
+ghostty
 
 # Dev tools
 build-essential

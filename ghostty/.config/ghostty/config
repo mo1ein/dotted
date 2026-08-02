@@ -1,0 +1,7 @@
+background = #191a1c
+background-opacity = 0.90
+foreground = #bababa
+cursor-color = #528bff
+selection-background = #2d3743
+theme = "Spacedust"
+title = "ghostty"

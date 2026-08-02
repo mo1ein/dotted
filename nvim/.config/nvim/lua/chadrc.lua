@@ -7,11 +7,7 @@ local M = {}
 
 M.base46 = {
   theme = "onedark",
-
-  -- hl_override = {
-  -- 	Comment = { italic = true },
-  -- 	["@comment"] = { italic = true },
-  -- },
+  transparency = true,
 }
 
 M.plugins = "plugins" -- ✅ this line tells NvChad where to find your plugins
