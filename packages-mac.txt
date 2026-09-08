@@ -1,0 +1,31 @@
+# List of Homebrew (macOS) packages — mirrors packages.txt for macOS
+# stow & neovim are required by this repo and are installed first
+
+# Required
+stow
+neovim
+
+# Tools
+wget
+curl
+git
+gnupg
+htop
+fzf
+tree
+ripgrep
+telnet
+
+# Editors
+vim
+
+# Shell/Terminal
+zsh
+tmux
+
+# Languages
+# brew 'python' ships pip & venv, and build-essential maps to the Xcode
+# Command Line Tools, which the Homebrew installer sets up automatically
+go
+python
+ipython
