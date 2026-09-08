@@ -29,6 +29,3 @@ tmux
 go
 python
 ipython
-
-# Other
-unrar
