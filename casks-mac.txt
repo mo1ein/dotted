@@ -1,0 +1,4 @@
+# Homebrew casks (GUI apps) — installed via `brew install --cask`
+bruno
+ghostty
+vlc
