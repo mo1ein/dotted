@@ -9,10 +9,12 @@ shopt -s dotglob
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="$HOME"
 PACKAGES_FILE="$DOTFILES_DIR/packages.txt"
+CASKS_FILE="$DOTFILES_DIR/casks-mac.txt"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$TIMESTAMP"
 ONLY_PKGS=false
 DRY_RUN=false
+OS=""
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -21,6 +23,20 @@ NC='\033[0m'
 log()  { echo -e "${GREEN}[info] $*${NC}"; }
 err()  { echo -e "${RED}[error] $*${NC}" >&2; }
 
+# --------- OS detection ---------
+
+detect_os() {
+  case "$(uname -s)" in
+    Darwin) OS="macos" ;;
+    Linux)  OS="linux" ;;
+    *) err "Unsupported OS: $(uname -s). This installer supports macOS and Linux."; exit 1 ;;
+  esac
+  log "Detected OS: $OS"
+
+  if [[ "$OS" == "macos" ]]; then
+    PACKAGES_FILE="$DOTFILES_DIR/packages-mac.txt"
+  fi
+}
 
 # --------- Helpers ---------
 
@@ -28,15 +44,66 @@ has_apt() {
   command -v apt-get >/dev/null 2>&1
 }
 
+# Portable readlink -f (macOS readlink doesn't support -f)
+readlink_f() {
+  local path="$1"
+  local dirname_path target
+  while [[ -L "$path" ]]; do
+    target="$(readlink "$path")"
+    if [[ "$target" != /* ]]; then
+      path="$(dirname "$path")/$target"
+    else
+      path="$target"
+    fi
+  done
+  dirname_path="$(dirname "$path")"
+  if [[ "$dirname_path" == "." ]]; then
+    dirname_path="$PWD"
+  elif [[ "$dirname_path" != /* ]]; then
+    dirname_path="$(cd "$dirname_path" && pwd)"
+  fi
+  echo "$dirname_path/$(basename "$path")"
+}
+
+ensure_homebrew() {
+  if command -v brew >/dev/null 2>&1; then
+    log "Homebrew is already installed."
+    return 0
+  fi
+
+  log "Homebrew not found. Installing Homebrew (brew)..."
+  if $DRY_RUN; then
+    log "DRY RUN: would run the official Homebrew installer."
+    return 0
+  fi
+
+  # The official installer also sets up the Xcode Command Line Tools when needed
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  # Make brew available in this session
+  # Apple Silicon -> /opt/homebrew, Intel -> /usr/local
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+}
+
 ensure_stow() {
   if command -v stow >/dev/null 2>&1; then
     return 0
   fi
 
-  log "GNU stow not found. Installing via apt..."
+  log "GNU stow not found. Installing..."
 
   if $DRY_RUN; then
-    log "DRY RUN: sudo apt-get update && sudo apt-get install -y --no-install-recommends stow"
+    log "DRY RUN: would install 'stow' via the ${OS} package manager."
+    return 0
+  fi
+
+  if [[ "$OS" == "macos" ]]; then
+    ensure_homebrew
+    brew install stow
     return 0
   fi
 
@@ -69,7 +136,7 @@ backup_target() {
 
   if [[ -L "$dest" ]]; then
     local link_target
-    link_target="$(readlink -f "$dest")"
+    link_target="$(readlink_f "$dest")"
     if [[ "$link_target" == "$DOTFILES_DIR"* ]]; then
       log "Already linked: $dest"
       return 1
@@ -96,7 +163,7 @@ backup_target() {
 is_linked() {
   if [[ -L "$1" ]]; then
     local link_target
-    link_target="$(readlink -f "$1")"
+    link_target="$(readlink_f "$1")"
     [[ "$link_target" == "$DOTFILES_DIR"* ]]
     return
   fi
@@ -219,29 +286,29 @@ restore_backups() {
 # --------- Package Installation ---------
 
 read_packages() {
-  sed -e 's/\r$//' -e 's/#.*//' "$DOTFILES_DIR/packages.txt" | awk 'NF'
+  tr -d '\r' < "$PACKAGES_FILE" | sed -e 's/#.*//' | awk 'NF'
 }
 
-install_packages() {
-  local -a pkgs
+read_casks() {
+  tr -d '\r' < "$CASKS_FILE" | sed -e 's/#.*//' | awk 'NF'
+}
 
-  # read_packages should output one package per line; mapfile -> array
-  mapfile -t pkgs < <(read_packages)
+# stow & neovim are required by this repo — installed before everything else
+is_essential() {
+  case "$1" in
+    stow|neovim) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+install_packages_linux() {
+  local -a pkgs=("$@")
 
   if (( ${#pkgs[@]} == 0 )); then
-    log "No packages to install."
     return 0
   fi
 
-  if ! has_apt; then
-    err "apt-get not available. Skipping package installation."
-    return 1
-  fi
-
   log "Installing packages: ${pkgs[*]}"
-  sudo apt-get update -y
-
-  # -- prevents pkg names that begin with '-' from being parsed as options
   if sudo apt-get install -y --no-install-recommends -- "${pkgs[@]}"; then
     log "Packages installed successfully."
   else
@@ -250,12 +317,93 @@ install_packages() {
   fi
 }
 
+install_casks() {
+  local -a casks=()
+  local line
+  while IFS= read -r line; do
+    casks+=("$line")
+  done < <(read_casks)
+
+  if (( ${#casks[@]} == 0 )); then
+    return 0
+  fi
+
+  log "Installing casks: ${casks[*]}"
+  brew install --cask "${casks[@]}"
+}
+
+install_packages_macos() {
+  local -a all=("$@")
+  local -a essential=()
+  local -a rest=()
+  local pkg
+
+  ensure_homebrew
+  if ! command -v brew >/dev/null 2>&1; then
+    err "brew is not available. Aborting package installation."
+    return 1
+  fi
+
+  # stow & neovim first — we need them
+  for pkg in "${all[@]}"; do
+    if is_essential "$pkg"; then
+      essential+=("$pkg")
+    else
+      rest+=("$pkg")
+    fi
+  done
+
+  if (( ${#essential[@]} > 0 )); then
+    log "Installing essential packages first: ${essential[*]}"
+    brew install "${essential[@]}"
+  fi
+
+  if (( ${#rest[@]} > 0 )); then
+    log "Installing packages: ${rest[*]}"
+    brew install "${rest[@]}"
+  fi
+
+  install_casks
+  log "Packages installed successfully."
+}
+
+install_packages() {
+  local -a pkgs=()
+  local line
+
+  while IFS= read -r line; do
+    pkgs+=("$line")
+  done < <(read_packages)
+
+  if (( ${#pkgs[@]} == 0 )); then
+    log "No packages to install."
+    return 0
+  fi
+
+  if [[ "$OS" == "macos" ]]; then
+    # On macOS, install stow & neovim first (brew installs them sequentially)
+    install_packages_macos "${pkgs[@]}"
+  else
+    # On Linux, apt installs everything in one transaction — order doesn't matter
+    if ! has_apt; then
+      err "apt-get not available. Skipping package installation."
+      return 1
+    fi
+    sudo apt-get update -y
+    install_packages_linux "${pkgs[@]}"
+  fi
+}
+
 
 install_oh_my_zsh() {
     if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
         log "Installing Oh My Zsh..."
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-        chsh -s "$(which zsh)"
+        if [[ "$OS" == "macos" ]]; then
+            chsh -s /bin/zsh
+        else
+            chsh -s "$(which zsh)"
+        fi
     else
         log "Oh My Zsh is already installed."
     fi
@@ -331,6 +479,8 @@ EOF
 # --------- main ---------
 
 main () {
+    detect_os
+
     while [[ $# -gt 0 ]]; do
       case "$1" in
         --install-pkgs|-i) ONLY_PKGS=true; shift ;;
@@ -346,8 +496,12 @@ main () {
         install_packages
         install_oh_my_zsh
         install_oh_my_zsh_plugins
-        install_gogh
-        install_docker_on_deb
+        if [[ "$OS" == "macos" ]]; then
+            log "Skipping Linux-only extras (Gogh themes, Docker apt repo) on macOS."
+        else
+            install_gogh
+            install_docker_on_deb
+        fi
     fi
     log "Done."
 }

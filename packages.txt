@@ -1,5 +1,9 @@
 # List of APT (debian/ubuntu) packages
 
+# stow & neovim are required by this repo — installed first
+stow
+neovim
+
 # Tools
 wget
 curl
@@ -12,7 +16,6 @@ ripgrep
 
 # Editors
 vim
-neovim
 
 # Shell/Terminal
 zsh
@@ -32,4 +35,3 @@ ipython3
 # Other
 vlc
 unrar
-
