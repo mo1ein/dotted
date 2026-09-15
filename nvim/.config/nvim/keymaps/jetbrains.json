@@ -1,0 +1,65 @@
+{
+  "name": "jetbrains",
+  "description": "JetBrains / IdeaVim muscle memory layered on top of the default leader keys.",
+  "extends": "default",
+
+  // Only the differences from `default` live here — everything else is inherited.
+  //
+  // The leader binding is kept alongside each IDE shortcut so nothing is lost by
+  // switching presets. Ctrl+Shift and Alt+F-key combos need a terminal that
+  // speaks the kitty keyboard protocol (Ghostty, Kitty, WezTerm) — in a terminal
+  // without it the leader half of each pair still works.
+  "bindings": {
+    // ── navigation & search ─────────────────────────────────────────────
+    "find.files": {
+      "linux": ["<leader>ff", "<C-S-n>"],
+      "macos": ["<leader>ff", "<C-S-n>", "<D-S-o>"]
+    },
+    "find.grep": {
+      "linux": ["<leader>fg", "<C-S-f>"],
+      "macos": ["<leader>fg", "<C-S-f>", "<D-S-f>"]
+    },
+    "find.commands": {
+      "linux": ["<leader>p", "<C-S-a>"],
+      "macos": ["<leader>p", "<C-S-a>", "<D-S-a>"]
+    },
+    "find.buffer": ["<leader>fz", "<C-f>"],
+    "find.replace": {
+      "linux": ["<leader>sr", "<C-S-r>"],
+      "macos": ["<leader>sr", "<C-S-r>", "<D-S-r>"]
+    },
+
+    // ── code ────────────────────────────────────────────────────────────
+    "lsp.definition": {
+      "linux": ["gd", "<C-b>"],
+      "macos": ["gd", "<C-b>", "<D-b>"]
+    },
+    "lsp.references": ["grr", "<A-F7>"],
+    "lsp.implementations": ["gri", "<C-A-b>"],
+    "lsp.rename": ["<leader>cr", "grn", "<S-F6>"],
+    "lsp.code_action": ["<leader>ca", "<A-CR>"],
+    "editor.format": {
+      "linux": ["<leader>fm", "<C-A-l>"],
+      "macos": ["<leader>fm", "<C-A-l>", "<D-A-l>"]
+    },
+    "editor.comment": {
+      "linux": ["<leader>/", "<C-/>", "<C-_>"],
+      "macos": ["<leader>/", "<C-/>", "<C-_>", "<D-/>"]
+    },
+    "editor.run_file": ["<leader>r", "<S-F10>"],
+
+    // ── tool windows ────────────────────────────────────────────────────
+    "ui.file_explorer": ["<leader>e", "<A-1>"],
+    "terminal.toggle_horizontal": ["<A-h>", "<A-F12>"],
+    "buffer.close": ["<leader>x", "<C-F4>"],
+    "window.zoom": ["<leader>z", "<C-S-F12>"],
+
+    // ── debug (JetBrains F-key layout) ──────────────────────────────────
+    "debug.continue": ["<leader>dc", "<F9>"],
+    "debug.breakpoint": ["<leader>db", "<C-F8>"],
+    "debug.step_over": ["<leader>do", "<F8>"],
+    "debug.step_into": ["<leader>di", "<F7>"],
+    "debug.step_out": ["<leader>dO", "<S-F8>"],
+    "debug.ui": ["<leader>du", "<A-5>"]
+  }
+}

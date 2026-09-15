@@ -1,7 +1,7 @@
 [user]
     name = moein
     email = moeinn.com@gmail.com
-    signingkey = 31C9C084C3F580EB
+    signingkey = 212F0EEA7961F05E
 
 [core]
     editor = nvim

@@ -14,9 +14,8 @@ local function apply()
   local config = require "jb.config"
   local opts = config.extend()
   local profile = vim.o.background
-  local palette = utils.read_palette "/lua/jb/palette.json"
-  local colors = palette.colors
-  local highlights = palette.highlights
+  local colors = utils.read_colors "/lua/jb/intellij-palette.json"
+  local highlights = utils.read_highlights "/lua/jb/highlights.json"
 
   vim.g.colors_name = "onedark"
 
@@ -117,7 +116,7 @@ require("lazy").setup({
 require "options"
 
 vim.schedule(function()
-  require "mappings"
+  require("keymaps").setup()
 end)
 
 local function set_transparent()

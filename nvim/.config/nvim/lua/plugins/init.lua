@@ -177,18 +177,6 @@ return {
     end,
   },
 
-  -- auto complete
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "L3MON4D3/luasnip",
-      "saadparwaiz1/cmp_luasnip",
-    },
-  },
-
   -- fzf
   {
     "ibhagwan/fzf-lua",
@@ -223,6 +211,15 @@ return {
     ft = { "markdown" },
   },
 
+  -- in-buffer markdown rendering (<leader>mr)
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    ft = { "markdown" },
+    cmd = { "RenderMarkdown" },
+    opts = {},
+  },
+
   -- statusline
   {
     "nvim-lualine/lualine.nvim",
@@ -238,10 +235,10 @@ return {
 
   {
     "lervag/vimtex",
-    dir = "/home/moein/.local/share/nvim/lazy/vimtex/",
     lazy = false, -- load immediately for .tex files
     config = function()
-      vim.g.vimtex_view_method = "zathura" -- or zathura,  "evince", "okular"
+      local platform = require "util.platform"
+      vim.g.vimtex_view_method = platform.is_mac and "skim" or "zathura" -- or "evince", "okular"
       vim.g.vimtex_compiler_method = "latexmk"
       vim.g.vimtex_compiler_latexmk = {
         continuous = 1,
