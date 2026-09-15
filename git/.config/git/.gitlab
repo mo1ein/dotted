@@ -1,6 +1,7 @@
 [user]
     name = moein
-    email = moeinn.com@gmail.com
+    email = m.halvaei@snapp.market
+    signingkey = F927527DD9DB9DF8
 
 [core]
     editor = nvim

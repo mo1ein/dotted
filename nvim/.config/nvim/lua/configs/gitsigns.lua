@@ -18,54 +18,7 @@ return {
   current_line_blame_formatter = "<author>, <author_time:%R>",
 
   on_attach = function(bufnr)
-    local gs = package.loaded.gitsigns
-
-    local function map(mode, l, r, desc)
-      vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
-    end
-
-    map("n", "]c", function()
-      if vim.wo.diff then
-        return "]c"
-      end
-      vim.schedule(function()
-        gs.next_hunk()
-      end)
-      return "<Ignore>"
-    end, "git: next hunk")
-
-    map("n", "[c", function()
-      if vim.wo.diff then
-        return "[c"
-      end
-      vim.schedule(function()
-        gs.prev_hunk()
-      end)
-      return "<Ignore>"
-    end, "git: prev hunk")
-
-    map("n", "<leader>gp", gs.preview_hunk, "git: preview hunk")
-    map("n", "<leader>gR", gs.reset_hunk, "git: reset hunk")
-    map("v", "<leader>gR", function()
-      gs.reset_hunk { vim.fn.line ".", vim.fn.line "v" }
-    end, "git: reset hunk")
-    map("n", "<leader>gs", gs.stage_hunk, "git: stage hunk")
-    map("v", "<leader>gs", function()
-      gs.stage_hunk { vim.fn.line ".", vim.fn.line "v" }
-    end, "git: stage hunk")
-    map("n", "<leader>gS", gs.stage_buffer, "git: stage buffer")
-    map("n", "<leader>gu", gs.undo_stage_hunk, "git: undo stage hunk")
-    map("n", "<leader>gd", gs.diffthis, "git: diff this")
-    map("n", "<leader>gD", function()
-      gs.diffthis "~"
-    end, "git: diff this ~")
-    map("n", "<leader>gb", function()
-      gs.blame_line { full = true }
-    end, "git: blame full")
-    map("n", "<leader>gl", function()
-      gs.toggle_current_line_blame()
-    end, "git: toggle line blame")
-    map("n", "<leader>td", gs.toggle_deleted, "git: toggle deleted")
+    require("keymaps").apply_buffer(bufnr, "git")
 
     local function set_git_highlights()
       local hl = function(group, opts)

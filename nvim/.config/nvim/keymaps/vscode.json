@@ -1,0 +1,61 @@
+{
+  "name": "vscode",
+  "description": "VS Code muscle memory layered on top of the default leader keys.",
+  "extends": "default",
+
+  // Only the differences from `default` live here — everything else is inherited.
+  //
+  // The leader binding is kept alongside each IDE shortcut so nothing is lost by
+  // switching presets. Ctrl+Shift and Ctrl+punctuation combos need a terminal
+  // that speaks the kitty keyboard protocol (Ghostty, Kitty, WezTerm).
+  "bindings": {
+    // ── navigation & search ─────────────────────────────────────────────
+    "find.files": {
+      "linux": ["<leader>ff", "<C-p>"],
+      "macos": ["<leader>ff", "<C-p>", "<D-p>"]
+    },
+    "find.commands": {
+      "linux": ["<leader>p", "<C-S-p>"],
+      "macos": ["<leader>p", "<C-S-p>", "<D-S-p>"]
+    },
+    "find.grep": {
+      "linux": ["<leader>fg", "<C-S-f>"],
+      "macos": ["<leader>fg", "<C-S-f>", "<D-S-f>"]
+    },
+    "find.buffer": ["<leader>fz", "<C-f>"],
+    "find.replace": {
+      "linux": ["<leader>sr", "<C-S-h>"],
+      "macos": ["<leader>sr", "<C-S-h>", "<D-S-h>"]
+    },
+
+    // ── code ────────────────────────────────────────────────────────────
+    "lsp.definition": ["gd", "<F12>"],
+    "lsp.references": ["grr", "<S-F12>"],
+    "lsp.rename": ["<leader>cr", "grn", "<F2>"],
+    "lsp.code_action": ["<leader>ca", "<C-.>"],
+    "editor.format": {
+      "linux": ["<leader>fm", "<S-A-f>"],
+      "macos": ["<leader>fm", "<S-A-f>", "<D-S-i>"]
+    },
+    "editor.comment": {
+      "linux": ["<leader>/", "<C-/>", "<C-_>"],
+      "macos": ["<leader>/", "<C-/>", "<C-_>", "<D-/>"]
+    },
+    "editor.run_file": ["<leader>r", "<C-F5>"],
+
+    // ── workbench ───────────────────────────────────────────────────────
+    "ui.file_explorer": {
+      "linux": ["<leader>e", "<C-b>"],
+      "macos": ["<leader>e", "<C-b>", "<D-b>"]
+    },
+    "buffer.next": ["<Tab>", "<C-Tab>"],
+    "buffer.prev": ["<S-Tab>", "<C-S-Tab>"],
+
+    // ── debug (VS Code F-key layout) ────────────────────────────────────
+    "debug.continue": ["<leader>dc", "<F5>"],
+    "debug.breakpoint": ["<leader>db", "<F9>"],
+    "debug.step_over": ["<leader>do", "<F10>"],
+    "debug.step_into": ["<leader>di", "<F11>"],
+    "debug.step_out": ["<leader>dO", "<S-F11>"]
+  }
+}

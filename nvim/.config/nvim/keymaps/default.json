@@ -1,0 +1,140 @@
+{
+  "name": "default",
+  "description": "Neovim-native layout: leader-driven, identical on Linux and macOS.",
+
+  // Value forms:
+  //   "<C-s>"                        one key
+  //   ["<C-s>", "<D-s>"]             several keys for the same action
+  //   { "linux": …, "macos": … }     per-OS; "default" covers the rest
+  //   false                          disable an inherited binding
+  //
+  // <D-…> is Cmd. A terminal cannot deliver it, so it is only ever listed
+  // *alongside* a Ctrl key that works everywhere — never on its own.
+  "bindings": {
+    // ── editor ──────────────────────────────────────────────────────────
+    "editor.save": {
+      "linux": "<C-s>",
+      "macos": ["<C-s>", "<D-s>"]
+    },
+    "editor.copy_file": "<C-c>",
+    "editor.clear_search": "<Esc>",
+    "editor.command_mode": ";",
+    "editor.escape": "jk",
+    "editor.format": "<leader>fm",
+    // <C-_> is what most terminals actually send for Ctrl+/
+    "editor.comment": {
+      "linux": ["<leader>/", "<C-/>", "<C-_>"],
+      "macos": ["<leader>/", "<C-/>", "<C-_>", "<D-/>"]
+    },
+    "editor.run_file": "<leader>r",
+
+    // ── insert-mode movement ────────────────────────────────────────────
+    "insert.line_start": "<C-b>",
+    "insert.line_end": "<C-e>",
+    "insert.left": "<C-h>",
+    "insert.right": "<C-l>",
+    "insert.down": "<C-j>",
+    "insert.up": "<C-k>",
+
+    // ── windows ─────────────────────────────────────────────────────────
+    "window.left": "<C-h>",
+    "window.right": "<C-l>",
+    "window.down": "<C-j>",
+    "window.up": "<C-k>",
+    "window.zoom": "<leader>z",
+
+    // ── buffers ─────────────────────────────────────────────────────────
+    "buffer.new": "<leader>b",
+    "buffer.next": "<Tab>",
+    "buffer.prev": "<S-Tab>",
+    "buffer.close": "<leader>x",
+
+    // ── ui ──────────────────────────────────────────────────────────────
+    "ui.line_numbers": "<leader>n",
+    "ui.relative_numbers": "<leader>rn",
+    "ui.cheatsheet": "<leader>ch",
+    "ui.file_explorer": "<leader>e",
+    "ui.keymap_table": "<leader>?",
+    "ui.whichkey_all": "<leader>wK",
+    "ui.whichkey_query": "<leader>wk",
+
+    // ── markdown (only bound inside markdown buffers) ───────────────────
+    "markdown.render": "<leader>mr",
+    "markdown.preview": "<leader>mp",
+    "markdown.terminal": "<leader>mt",
+
+    // ── find & replace ──────────────────────────────────────────────────
+    "find.files": {
+      "linux": "<leader>ff",
+      "macos": ["<leader>ff", "<D-p>"]
+    },
+    "find.grep": {
+      "linux": "<leader>fg",
+      "macos": ["<leader>fg", "<D-S-f>"]
+    },
+    "find.buffer": "<leader>fz",
+    "find.replace": "<leader>sr",
+    "find.commands": {
+      "linux": "<leader>p",
+      "macos": ["<leader>p", "<D-S-p>"]
+    },
+
+    // ── terminal ────────────────────────────────────────────────────────
+    // Alt needs `macos-option-as-alt = true` in the Ghostty config.
+    "terminal.escape": "<C-x>",
+    "terminal.horizontal": "<leader>h",
+    "terminal.vertical": "<leader>v",
+    "terminal.toggle_horizontal": "<A-h>",
+    "terminal.toggle_vertical": "<A-v>",
+    "terminal.toggle_float": "<A-i>",
+
+    // ── git ─────────────────────────────────────────────────────────────
+    "git.commits": "<leader>gc",
+    "git.status": "<leader>gt",
+    "git.next_hunk": "]c",
+    "git.prev_hunk": "[c",
+    "git.preview_hunk": "<leader>gp",
+    "git.stage_hunk": "<leader>gs",
+    "git.reset_hunk": "<leader>gR",
+    "git.stage_buffer": "<leader>gS",
+    "git.undo_stage": "<leader>gu",
+    "git.diff": "<leader>gd",
+    "git.diff_last": "<leader>gD",
+    "git.blame_line": "<leader>gb",
+    "git.toggle_blame": "<leader>gl",
+    "git.toggle_deleted": "<leader>td",
+
+    // ── lsp ─────────────────────────────────────────────────────────────
+    "lsp.declaration": "gD",
+    "lsp.definition": "gd",
+    "lsp.type_definition": "<leader>D",
+    "lsp.references": "grr",
+    "lsp.implementations": "gri",
+    "lsp.hover": "K",
+    "lsp.signature": "<leader>cs",
+    "lsp.code_action": "<leader>ca",
+    // <leader>rn is "toggle relative numbers"; rename lives under the code group
+    "lsp.rename": ["<leader>cr", "grn"],
+    "lsp.diagnostics": "<leader>ds",
+    "lsp.info": "<leader>cI",
+    "lsp.restart": "<leader>cR",
+    "lsp.workspace_add": "<leader>wa",
+    "lsp.workspace_remove": "<leader>wr",
+    "lsp.workspace_list": "<leader>wl",
+
+    // ── debug ───────────────────────────────────────────────────────────
+    "debug.continue": "<leader>dc",
+    "debug.breakpoint": "<leader>db",
+    "debug.step_over": "<leader>do",
+    "debug.step_into": "<leader>di",
+    "debug.step_out": "<leader>dO",
+    "debug.repl": "<leader>dr",
+    "debug.run_last": "<leader>dl",
+    "debug.ui": "<leader>du",
+    "debug.terminate": "<leader>dx",
+
+    // ── go ──────────────────────────────────────────────────────────────
+    "go.generate": "<leader>gg",
+    "go.fill_struct": "<leader>gf"
+  }
+}

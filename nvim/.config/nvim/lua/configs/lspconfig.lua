@@ -1,5 +1,4 @@
 local M = {}
-local map = vim.keymap.set
 
 -- Tracks buffers that have already had LSP keymaps attached.
 -- Guards against the rare double-fire when multiple servers attach to the
@@ -40,9 +39,7 @@ M.on_attach = function(_, bufnr)
   if lsp_attached_buffers[bufnr] then return end
   lsp_attached_buffers[bufnr] = true
 
-  local function opts(desc)
-    return { buffer = bufnr, desc = "LSP " .. desc }
-  end
+  require("keymaps").apply_buffer(bufnr, "lsp")
 
   -- Auto-format Go files on save (guard so we don't crash without vim-go)
   if vim.bo[bufnr].filetype == "go" then
@@ -57,33 +54,6 @@ M.on_attach = function(_, bufnr)
       end,
     })
   end
-
-  -- Navigation
-  map("n", "gD",        vim.lsp.buf.declaration,               opts "Go to declaration")
-  map("n", "gd",        vim.lsp.buf.definition,                opts "Go to definition")
-  map("n", "<leader>D", vim.lsp.buf.type_definition,           opts "Go to type definition")
-  map("n", "grr",       "<cmd>FzfLua lsp_references<CR>",      opts "References")
-  map("n", "gri",       "<cmd>FzfLua lsp_implementations<CR>", opts "Implementations")
-
-  -- Workspace
-  map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder,    opts "Add workspace folder")
-  map("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, opts "Remove workspace folder")
-  map("n", "<leader>wl", function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, opts "List workspace folders")
-
-  -- Code actions & rename  (kept nvchad renamer; dropped duplicate native map)
-  map("n", "<leader>ca", vim.lsp.buf.code_action,         opts "Code actions")
-  map("n", "<leader>rn", require("nvchad.lsp.renamer"),   opts "Rename")
-
-  -- Hover
-  map("n", "K", function()
-    vim.lsp.buf.hover({ border = "rounded" })
-  end, opts "Hover documentation")
-
-  -- LSP management
-  map("n", "<leader>cI", "<cmd>LspInfo<CR>",    opts "LSP info")
-  map("n", "<leader>vR", "<cmd>LspRestart<CR>", opts "Restart LSP")
 end
 
 -- ---------------------------------------------------------------------------
