@@ -1,4 +1,4 @@
--- vscode format
+-- Load snippet libraries and optional user paths in VS Code/SnipMate/Lua formats.
 require("luasnip.loaders.from_vscode").lazy_load { exclude = vim.g.vscode_snippets_exclude or {} }
 require("luasnip.loaders.from_vscode").lazy_load { paths = vim.g.vscode_snippets_path or "" }
 
