@@ -1,147 +1,76 @@
--- Run the current file according to its filetype.
---
--- Every runner resolves its interpreter/compiler through platform.first_executable
--- so the same mapping works on Linux and macOS instead of assuming a binary that
--- only one of them ships (e.g. `lua` exists on Debian, not on a stock mac).
-
+-- Execute the focused source using argv, without an intermediate login shell.
 local platform = require "util.platform"
-
---- Run a shell command through :! , or report which tool is missing.
---- @param candidates string[] executables to try, in order of preference
---- @param build fun(bin: string): string builds the shell command from the winner
-local function run_with(candidates, build)
+local function executable(candidates)
   local bin = platform.first_executable(candidates)
-  if not bin then
-    vim.notify(
-      ("run: none of %s found in PATH"):format(table.concat(candidates, ", ")),
-      vim.log.levels.ERROR
-    )
-    return
-  end
-  vim.cmd("!" .. build(bin))
+  if not bin then vim.notify("run: none of " .. table.concat(candidates, ", ") .. " found in PATH", vim.log.levels.ERROR) end
+  return bin
 end
-
---- True when the cwd looks like a uv-managed Python project.
-local function is_uv_project()
-  local cwd = vim.fn.getcwd()
-  for _, marker in ipairs { "/uv.lock", "/uv.toml", "/pyproject.toml" } do
-    if vim.fn.filereadable(cwd .. marker) == 1 then
-      return true
-    end
-  end
-  return false
+local function output(command, opts)
+  opts = opts or {}
+  opts.cwd = opts.cwd or vim.fn.expand "%:p:h"
+  return require("ui.output").run(command, opts)
 end
-
---- Run a user command if the plugin providing it is loaded, else fall back.
-local function try_cmd(name, fallback)
-  if vim.fn.exists(":" .. name) ~= 0 then
-    vim.cmd(name)
-    return true
-  end
-  if fallback then
-    fallback()
-  end
-  return false
+local function run(candidates, arguments, opts)
+  local bin = executable(candidates)
+  if bin then return output(vim.list_extend({ bin }, arguments), opts) end
 end
-
+local function try_command(name, missing)
+  if vim.fn.exists(":" .. name) ~= 0 then vim.cmd(name)
+  elseif missing then missing() else vim.notify("run: " .. name .. " is unavailable", vim.log.levels.ERROR) end
+end
 local runners = {
-  markdown = function()
-    try_cmd("MarkdownPreview", function()
-      vim.notify("run: markdown-preview.nvim is not installed", vim.log.levels.ERROR)
-    end)
+  markdown = function() try_command "MarkdownPreview" end,
+  tex = function(file)
+    try_command("VimtexCompile", function() return run({ "latexmk" }, { "-pdf", "-interaction=nonstopmode", file }) end)
   end,
-
-  go = function()
-    try_cmd("GoRun", function()
-      run_with({ "go" }, function(bin)
-        return bin .. " run %"
-      end)
-    end)
-  end,
-
-  python = function()
-    if is_uv_project() then
-      run_with({ "uv" }, function(bin)
-        return bin .. " run %"
-      end)
-    else
-      -- macOS has no bare `python`; Debian needs python-is-python3 for it
-      run_with({ "python3", "python" }, function(bin)
-        return bin .. " %"
-      end)
+  go = function(file)
+    -- Editor runs don't need build-info VCS stamping. Avoid making Go walk
+    -- large repositories to collect it on every Run click.
+    if vim.fs.root(file, "go.mod") then
+      return run({ "go" }, { "run", "-buildvcs=false", "." }, { name = "Go: current package" })
     end
+    return run({ "go" }, { "run", "-buildvcs=false", file })
   end,
-
-  tex = function()
-    try_cmd("VimtexCompile", function()
-      run_with({ "latexmk" }, function(bin)
-        return bin .. " -pdf -interaction=nonstopmode %"
-      end)
-    end)
+  python = function(file)
+    local root = vim.fs.root(file, { "uv.lock", "uv.toml" })
+    local suffix = vim.fn.has "win32" == 1 and "/Scripts/python.exe" or "/bin/python"
+    local has_env = root and vim.fn.executable(root .. "/.venv" .. suffix) == 1
+    -- Bootstrap a uv environment only when needed. Once it exists, run its
+    -- interpreter directly instead of resolving/syncing the project every time.
+    if root and not has_env and not vim.env.VIRTUAL_ENV and not vim.env.CONDA_PREFIX
+      and not (require("config.debug").python or {}).interpreter then
+      return run({ "uv" }, { "run", "--", file }, { cwd = root })
+    end
+    return output({ require("configs.dap_python").interpreter(), file })
   end,
-
-  lua = function()
-    -- A stock macOS has neither; nvim itself can always run a Lua file
+  javascript = function(file) return run({ "node" }, { file }) end,
+  lua = function(file)
     local bin = platform.first_executable { "lua", "luajit" }
-    if bin then
-      vim.cmd("!" .. bin .. " %")
-    else
-      vim.cmd "luafile %"
-    end
+    if bin then return output { bin, file } end
+    return output { vim.v.progpath, "--headless", "-u", "NONE", "-l", file }
   end,
-
-  sh = function()
-    run_with({ "bash", "sh" }, function(bin)
-      return bin .. " %"
-    end)
-  end,
-
-  javascript = function()
-    run_with({ "node" }, function(bin)
-      return bin .. " %"
-    end)
-  end,
-
-  rust = function()
-    run_with({ "cargo" }, function(bin)
-      return bin .. " run"
-    end)
-  end,
-
-  c = function()
-    local out = vim.fn.expand "%:r"
-    -- `cc` is clang on macOS and gcc on Debian — present on both
-    run_with({ "cc", "gcc", "clang" }, function(bin)
-      return ("%s %s -o %s && ./%s"):format(bin, vim.fn.expand "%", out, out)
-    end)
-  end,
-
-  cpp = function()
-    local out = vim.fn.expand "%:r"
-    run_with({ "c++", "g++", "clang++" }, function(bin)
-      return ("%s %s -o %s && ./%s"):format(bin, vim.fn.expand "%", out, out)
-    end)
+  sh = function(file) return run({ "bash", "sh" }, { file }) end,
+  zsh = function(file) return run({ "zsh" }, { file }) end,
+  rust = function(file)
+    local root = vim.fs.root(file, "Cargo.toml")
+    if not root then vim.notify("run: Cargo project not found", vim.log.levels.WARN); return end
+    return run({ "cargo" }, { "run" }, { cwd = root })
   end,
 }
-
--- filetypes that share a runner
-runners.bash = runners.sh
-runners.zsh = runners.sh
-runners.typescript = runners.javascript
-
+local function compile(candidates, file)
+  local bin = executable(candidates)
+  if not bin then return end
+  local target = vim.fn.fnamemodify(file, ":r")
+  return output(("%s %s -o %s && %s"):format(vim.fn.shellescape(bin), vim.fn.shellescape(file), vim.fn.shellescape(target), vim.fn.shellescape(target)))
+end
+runners.c = function(file) return compile({ "cc", "gcc", "clang" }, file) end
+runners.cpp = function(file) return compile({ "c++", "g++", "clang++" }, file) end
+runners.bash, runners.typescript = runners.sh, runners.javascript
 return function()
-  if vim.fn.expand "%" == "" then
-    vim.notify("run: buffer has no file name", vim.log.levels.WARN)
-    return
-  end
-
-  local ft = vim.bo.filetype
-  local runner = runners[ft]
-  if not runner then
-    vim.notify("run: no runner defined for filetype " .. (ft == "" and "?" or ft), vim.log.levels.WARN)
-    return
-  end
-
-  vim.cmd "write"
-  runner()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then vim.notify("run: buffer has no file name", vim.log.levels.WARN); return end
+  local runner = runners[vim.bo.filetype]
+  if not runner then vim.notify("run: no runner for " .. vim.bo.filetype, vim.log.levels.WARN); return end
+  require("util.launch_save").save { buf = vim.api.nvim_get_current_buf(), path = file }
+  return runner(file)
 end
