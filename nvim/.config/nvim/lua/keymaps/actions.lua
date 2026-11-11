@@ -1,7 +1,7 @@
 -- Action registry.
 --
 -- An action is *what* a key does. It never says *which* key triggers it — that
--- lives in keymaps/<preset>.json. Keeping the two apart is what makes presets
+-- lives in lua/keymaps/presets/<preset>.lua. Keeping the two apart makes presets
 -- (default / jetbrains / vscode) and per-OS overrides possible without
 -- duplicating any implementation.
 --
@@ -52,7 +52,7 @@ local function gs_nav(direction)
       return
     end
     if gs.nav_hunk then
-      gs.nav_hunk { target = direction }
+      gs.nav_hunk(direction)
     elseif direction == "next" then
       gs.next_hunk()
     else
@@ -89,6 +89,11 @@ local zoom_state = {}
 
 return {
   -- ── editor ────────────────────────────────────────────────────────────────
+  ["editor.undo"] = { desc = "undo", rhs = "u" },
+  ["editor.undo_insert"] = { desc = "undo", mode = "i", rhs = "<C-o>u" },
+  ["editor.redo_insert"] = { desc = "redo", mode = "i", rhs = "<C-o><C-r>" },
+  ["editor.debug_file"] = { desc = "debug focused file", rhs = call("ui.run_toolbar", "action", 9) },
+  ["editor.redo"] = { desc = "redo", rhs = "<C-r>" },
   ["editor.save"] = { desc = "save file", mode = { "n", "i" }, rhs = cmd "write" },
   ["editor.copy_file"] = { desc = "copy whole file", rhs = cmd "%y+" },
   ["editor.clear_search"] = { desc = "clear search highlights", rhs = cmd "nohlsearch" },
@@ -113,7 +118,13 @@ return {
   ["editor.run_file"] = {
     desc = "run current file",
     rhs = function()
-      require "util.run_file"()
+      return require("util.run").file()
+    end,
+  },
+  ["editor.run_project"] = {
+    desc = "run project",
+    rhs = function()
+      return require("util.run").project()
     end,
   },
 
@@ -147,15 +158,29 @@ return {
 
   -- ── buffers ───────────────────────────────────────────────────────────────
   ["buffer.new"] = { desc = "new buffer", rhs = cmd "enew" },
-  ["buffer.next"] = { desc = "next buffer", rhs = call("nvchad.tabufline", "next") },
-  ["buffer.prev"] = { desc = "previous buffer", rhs = call("nvchad.tabufline", "prev") },
-  ["buffer.close"] = { desc = "close buffer", rhs = call("nvchad.tabufline", "close_buffer") },
+  ["buffer.next"] = { desc = "next buffer", rhs = cmd "bnext" },
+  ["buffer.prev"] = { desc = "previous buffer", rhs = cmd "bprevious" },
+  ["buffer.close"] = { desc = "close buffer", rhs = cmd "bdelete" },
+  ["buffer.recent_next"] = { desc = "switch to older recent buffer", mode = { "n", "i" }, rhs = call("ui.switcher", "cycle", "next") },
+  ["buffer.recent_prev"] = { desc = "switch backward through recent buffers", mode = { "n", "i" }, rhs = call("ui.switcher", "cycle", "prev") },
+  ["buffer.go_1"] = { desc = "go to buffer 1", rhs = call("ui.buffers", "go", 1) },
+  ["buffer.go_2"] = { desc = "go to buffer 2", rhs = call("ui.buffers", "go", 2) },
+  ["buffer.go_3"] = { desc = "go to buffer 3", rhs = call("ui.buffers", "go", 3) },
+  ["buffer.go_4"] = { desc = "go to buffer 4", rhs = call("ui.buffers", "go", 4) },
+  ["buffer.go_5"] = { desc = "go to buffer 5", rhs = call("ui.buffers", "go", 5) },
+  ["buffer.go_6"] = { desc = "go to buffer 6", rhs = call("ui.buffers", "go", 6) },
+  ["buffer.go_7"] = { desc = "go to buffer 7", rhs = call("ui.buffers", "go", 7) },
+  ["buffer.go_8"] = { desc = "go to buffer 8", rhs = call("ui.buffers", "go", 8) },
+  ["buffer.go_9"] = { desc = "go to buffer 9", rhs = call("ui.buffers", "go", 9) },
+  ["ui.breadcrumbs"] = { desc = "browse current file path", rhs = call("ui.breadcrumbs", "pick") },
+  ["ui.tools"] = { desc = "toggle bottom tools", rhs = call("ui.tools", "toggle") },
 
   -- ── ui ────────────────────────────────────────────────────────────────────
   ["ui.line_numbers"] = { desc = "toggle line numbers", rhs = toggle "number" },
   ["ui.relative_numbers"] = { desc = "toggle relative numbers", rhs = toggle "relativenumber" },
-  ["ui.cheatsheet"] = { desc = "toggle cheatsheet", rhs = cmd "NvCheatsheet" },
-  ["ui.file_explorer"] = { desc = "toggle file explorer", rhs = cmd "NvimTreeToggle" },
+  ["ui.cheatsheet"] = { desc = "show cheatsheet", rhs = cmd "Cheatsheet" },
+  ["ui.file_explorer"] = { desc = "toggle file explorer", rhs = call("ui.explorer", "toggle") },
+  ["ui.theme"] = { desc = "preview / pick colorscheme", rhs = cmd "Theme", opts = { nowait = true } },
   ["ui.keymap_table"] = { desc = "show keymap table", rhs = cmd "Keymaps" },
   ["ui.whichkey_all"] = { desc = "show all keymaps", rhs = cmd "WhichKey" },
   ["ui.whichkey_query"] = {
@@ -199,10 +224,15 @@ return {
   },
 
   -- ── find / replace ────────────────────────────────────────────────────────
+  ["find.spotlight"] = {
+    desc = "spotlight search (ctrl-l/ctrl-h to switch category)",
+    rhs = function() require("util.spotlight").open() end,
+  },
   ["find.files"] = { desc = "find files", rhs = cmd "FzfLua files" },
   ["find.grep"] = { desc = "grep in project", rhs = cmd "FzfLua live_grep" },
   ["find.buffer"] = { desc = "find in buffer", rhs = cmd "FzfLua grep_curbuf" },
-  ["find.replace"] = { desc = "search & replace in project", rhs = cmd "GrugFar" },
+  ["find.replace"] = { desc = "find & replace in project", rhs = cmd "ReplaceProject" },
+  ["find.replace_buffer"] = { desc = "find & replace in current buffer", rhs = cmd "Replace" },
   ["find.commands"] = {
     desc = "command palette",
     rhs = function()
@@ -227,31 +257,32 @@ return {
   ["terminal.escape"] = { desc = "leave terminal mode", mode = "t", rhs = "<C-\\><C-n>" },
   ["terminal.horizontal"] = {
     desc = "new horizontal terminal",
-    rhs = call("nvchad.term", "new", { pos = "sp" }),
+    rhs = call("util.terminal", "new", { pos = "sp" }),
   },
   ["terminal.vertical"] = {
     desc = "new vertical terminal",
-    rhs = call("nvchad.term", "new", { pos = "vsp" }),
+    rhs = call("util.terminal", "new", { pos = "vsp" }),
   },
   ["terminal.toggle_horizontal"] = {
     desc = "toggle horizontal terminal",
     mode = { "n", "t" },
-    rhs = call("nvchad.term", "toggle", { pos = "sp", id = "htoggleTerm" }),
+    rhs = call("util.terminal", "toggle", { pos = "sp", id = "htoggleTerm" }),
   },
   ["terminal.toggle_vertical"] = {
     desc = "toggle vertical terminal",
     mode = { "n", "t" },
-    rhs = call("nvchad.term", "toggle", { pos = "vsp", id = "vtoggleTerm" }),
+    rhs = call("util.terminal", "toggle", { pos = "vsp", id = "vtoggleTerm" }),
   },
   ["terminal.toggle_float"] = {
     desc = "toggle floating terminal",
     mode = { "n", "t" },
-    rhs = call("nvchad.term", "toggle", { pos = "float", id = "floatTerm" }),
+    rhs = call("util.terminal", "toggle", { pos = "float", id = "floatTerm" }),
   },
 
   -- ── git (global) ──────────────────────────────────────────────────────────
   ["git.commits"] = { desc = "browse commits", rhs = cmd "FzfLua git_commits" },
   ["git.status"] = { desc = "git status", rhs = cmd "FzfLua git_status" },
+  ["git.graph"] = { desc = "Git graph / workspace", rhs = call("ui.git", "open") },
 
   -- ── git (buffer-local, applied when gitsigns attaches) ────────────────────
   ["git.next_hunk"] = { scope = "git", desc = "next hunk", rhs = gs_nav "next" },
@@ -291,14 +322,7 @@ return {
   ["lsp.rename"] = {
     scope = "lsp",
     desc = "rename symbol",
-    rhs = function()
-      local ok, renamer = pcall(require, "nvchad.lsp.renamer")
-      if ok then
-        renamer()
-      else
-        vim.lsp.buf.rename()
-      end
-    end,
+    rhs = vim.lsp.buf.rename,
   },
   ["lsp.diagnostics"] = { desc = "diagnostics to loclist", rhs = vim.diagnostic.setloclist },
   ["lsp.info"] = { scope = "lsp", desc = "lsp info", rhs = cmd "checkhealth vim.lsp" },
@@ -320,11 +344,22 @@ return {
   ["debug.step_into"] = { desc = "step into", rhs = call("dap", "step_into") },
   ["debug.step_out"] = { desc = "step out", rhs = call("dap", "step_out") },
   ["debug.repl"] = { desc = "toggle repl", rhs = call("dap", "repl.toggle") },
-  ["debug.run_last"] = { desc = "re-run last session", rhs = call("dap", "run_last") },
-  ["debug.ui"] = { desc = "toggle debug ui", rhs = call("dapui", "toggle") },
+  ["debug.run_last"] = { desc = "re-run last resolved debug launch", rhs = call("util.debug_session", "restart") },
+  ["debug.ui"] = { desc = "toggle debug ui", rhs = call("ui.dap", "toggle") },
   ["debug.terminate"] = { desc = "terminate session", rhs = call("dap", "terminate") },
+  ["debug.inspect"] = { desc = "inspect variable / expression", mode = { "n", "v" }, rhs = call("dapui", "eval") },
+  ["debug.test"] = { desc = "debug nearest Go test", rhs = call("dap-go", "debug_test") },
+  ["debug.test_last"] = { desc = "debug last Go test", rhs = call("dap-go", "debug_last_test") },
 
   -- ── go ────────────────────────────────────────────────────────────────────
   ["go.generate"] = { desc = "go generate", rhs = cmd "GoGenerate" },
-  ["go.fill_struct"] = { desc = "go fill struct", rhs = cmd "GoFillStruct" },
+  ["go.fill_struct"] = {
+    desc = "go fill struct",
+    rhs = function()
+      vim.lsp.buf.code_action {
+        filter = function(action) return action.title:lower():find("fill", 1, true) ~= nil end,
+        apply = true,
+      }
+    end,
+  },
 }

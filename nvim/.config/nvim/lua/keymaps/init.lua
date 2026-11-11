@@ -1,14 +1,8 @@
--- JSON-driven keybindings, Zed style.
+-- Lua keybinding presets with inheritance and per-platform overrides.
 --
--- Keys live in keymaps/<preset>.json; what they do lives in keymaps/actions.lua.
--- A preset may `extends` another one and only list its differences, and any
--- binding may carry per-OS variants:
---
---   "editor.save": "<C-s>"                          same key everywhere
---   "editor.save": ["<C-s>", "<D-s>"]               several keys, same action
---   "editor.save": { "linux": "<C-s>",              per-OS
---                    "macos": ["<C-s>", "<D-s>"] }
---   "editor.save": false                            disabled in this preset
+-- Keys live in lua/keymaps/presets/<preset>.lua; implementations in actions.lua.
+-- Presets can extend one another. Binding values accept a string, a list of
+-- strings, a per-OS table (linux/macos/default), or false to disable a binding.
 --
 -- Pick the preset with `vim.g.keymap_preset` (see init.lua) or the
 -- NVIM_KEYMAP_PRESET environment variable, which wins so a single machine can
@@ -19,7 +13,7 @@ local platform = require "util.platform"
 
 local M = {}
 
-local PRESET_DIR = vim.fn.stdpath "config" .. "/keymaps"
+local PRESET_DIR = vim.fn.stdpath "config" .. "/lua/keymaps/presets"
 local DEFAULT_PRESET = "default"
 
 -- which-key group labels, emitted only for prefixes the active preset uses
@@ -30,8 +24,8 @@ local GROUPS = {
   ["<leader>g"] = "git / go",
   ["<leader>m"] = "markdown",
   ["<leader>s"] = "search",
-  ["<leader>t"] = "terminal / toggle",
   ["<leader>w"] = "workspace / which-key",
+  ["<leader>u"] = "workspace UI",
 }
 
 -- Buffer-local scopes that attach on a filetype rather than on a plugin event.
@@ -44,20 +38,9 @@ local cache = nil
 
 -- ── preset loading ──────────────────────────────────────────────────────────
 
---- Drop whole-line // comments so the JSON can be annotated like Zed's keymap.
-local function strip_comments(raw)
-  local out = {}
-  for line in (raw .. "\n"):gmatch "([^\n]*)\n" do
-    if not line:match "^%s*//" then
-      out[#out + 1] = line
-    end
-  end
-  return table.concat(out, "\n")
-end
-
 function M.available()
   local names = {}
-  for _, path in ipairs(vim.fn.glob(PRESET_DIR .. "/*.json", false, true)) do
+  for _, path in ipairs(vim.fn.glob(PRESET_DIR .. "/*.lua", false, true)) do
     names[#names + 1] = vim.fn.fnamemodify(path, ":t:r")
   end
   table.sort(names)
@@ -77,15 +60,15 @@ local function read_preset(name, seen)
   end
   seen[name] = true
 
-  local path = PRESET_DIR .. "/" .. name .. ".json"
+  assert(name:match "^[%w_-]+$", "keymaps: invalid preset name")
+  local path = PRESET_DIR .. "/" .. name .. ".lua"
   if vim.fn.filereadable(path) == 0 then
     error(("keymaps: preset '%s' not found (%s)"):format(name, path))
   end
 
-  local raw = strip_comments(table.concat(vim.fn.readfile(path), "\n"))
-  local ok, data = pcall(vim.json.decode, raw, { luanil = { object = true, array = true } })
+  local ok, data = pcall(dofile, path)
   if not ok then
-    error(("keymaps: %s is not valid JSON — %s"):format(path, data))
+    error(("keymaps: could not load %s — %s"):format(path, data))
   end
 
   local bindings = data.extends and read_preset(data.extends, seen).bindings or {}

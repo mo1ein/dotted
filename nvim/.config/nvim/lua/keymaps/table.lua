@@ -40,6 +40,64 @@ local GROUP_ORDER = {
   "find", "markdown", "terminal", "git", "lsp", "debug", "go",
 }
 
+-- Plugin-owned references: documented here, never installed as global mappings.
+M.tree_shortcuts = {
+  { key = "/", desc = "Toggle explorer path search (tree only)" },
+  { key = "<C-e>", desc = "Toggle explorer, preserving its chosen side" },
+  { key = "<C-f>", desc = "Toggle explorer path search (tree only)" },
+  { key = "<Esc>", desc = "Close explorer path search" },
+  { key = "f", desc = "Toggle explorer path search" },
+  { key = "F", desc = "Create new folder" },
+  { key = "g/", desc = "Close explorer search" },
+  { key = "a", desc = "Create file or directory (trailing /)" },
+  { key = "<CR>", desc = "Open file or toggle directory" },
+  { key = "r", desc = "Rename file or directory" },
+  { key = "d", desc = "Delete file or directory (confirmation)" },
+  { key = "x", desc = "Cut file or directory" },
+  { key = "c", desc = "Copy file or directory" },
+  { key = "p", desc = "Paste file or directory" },
+  { key = "R", desc = "Refresh tree" },
+  { key = "W", desc = "Collapse all folders" },
+  { key = "gE", desc = "Expand selected folder recursively" },
+  { key = "gS", desc = "Choose name / extension sorting" },
+  { key = "gF", desc = "Toggle follow current file" },
+  { key = "gM", desc = "Move explorer left / right / top / bottom" },
+  { key = "g?", desc = "Show all NvimTree shortcuts" },
+  { key = "<C-v>", desc = "Open file in a vertical split" },
+  { key = "<C-x>", desc = "Open file in a horizontal split" },
+  { key = "<C-t>", desc = "Open file in a new tab" },
+}
+
+-- Shared grouped data for the native dashboard; resolve the active OS/preset.
+function M.sections(preset, os_name)
+  local resolved = require("keymaps").resolve(os_name, preset)
+  local buckets, sections = {}, {}
+  for _, entry in ipairs(resolved.bindings) do
+    buckets[entry.group] = buckets[entry.group] or {}
+    table.insert(buckets[entry.group], entry)
+  end
+  local function add(name)
+    if not buckets[name] then return end
+    sections[#sections + 1] = { title = GROUP_TITLES[name] or name, rows = buckets[name] }
+    buckets[name] = nil
+  end
+  for _, name in ipairs(GROUP_ORDER) do add(name) end
+  for _, name in ipairs(vim.fn.sort(vim.tbl_keys(buckets))) do add(name) end
+  local tree = { title = "NvimTree · tree only", rows = {} }
+  for _, shortcut in ipairs(M.tree_shortcuts) do
+    tree.rows[#tree.rows + 1] = { keys = { shortcut.key }, desc = shortcut.desc, mode = "n", scope = "tree" }
+  end
+  sections[#sections + 1] = tree
+  for _, context in ipairs(require "keymaps.contexts") do
+    local section = { title = context.title .. " · context only", rows = {} }
+    for _, row in ipairs(context.rows) do
+      section.rows[#section.rows + 1] = { keys = row.keys, desc = row.desc, mode = row.mode or "n", scope = "context" }
+    end
+    sections[#sections + 1] = section
+  end
+  return sections
+end
+
 -- ── formatting helpers ──────────────────────────────────────────────────────
 
 --- Human-readable modifier list for a set of keys, e.g. "Ctrl, Cmd".
@@ -142,7 +200,7 @@ local function render_preset(preset_name, opts)
     add()
   end
   if resolved.preset.extends then
-    add(("Extends `%s` — only the differences are listed in its JSON file."):format(resolved.preset.extends))
+    add(("Extends `%s` — only the differences are listed in its Lua file."):format(resolved.preset.extends))
     add()
   end
 
@@ -193,6 +251,30 @@ local function render_preset(preset_name, opts)
     add()
   end
 
+  -- Plugin-owned defaults aren't part of our presets and must not become global maps.
+  add(("%s# NvimTree"):format(heading))
+  add()
+  add "These shortcuts apply only while focused on a file in NvimTree (all presets)."
+  add()
+  add "| Key | Action |"
+  add "| --- | --- |"
+  for _, shortcut in ipairs(M.tree_shortcuts) do
+    add(("| `%s` | %s |"):format(shortcut.key, shortcut.desc))
+  end
+  add()
+  for _, context in ipairs(require "keymaps.contexts") do
+    add(("%s# %s (context only)"):format(heading, context.title))
+    add()
+    add(context.note)
+    add()
+    add "| Key | Action | Mode |"
+    add "| --- | --- | --- |"
+    for _, row in ipairs(context.rows) do
+      add(("| %s | %s | %s |"):format(fmt_keys(row.keys), row.desc, fmt_mode(row.mode or "n")))
+    end
+    add()
+  end
+
   return out
 end
 
@@ -209,8 +291,8 @@ function M.render_all()
     "Switch presets with `:KeymapPreset <name>`, or permanently via `vim.g.keymap_preset`",
     "in `nvim/.config/nvim/init.lua`. `NVIM_KEYMAP_PRESET` overrides both for one machine.",
     "",
-    "`<D-…>` is Cmd. Terminal Neovim cannot receive Cmd, so those entries only fire in a",
-    "GUI client (Neovide, VimR); the Ctrl variant on the same row works everywhere.",
+    "`<D-…>` is Cmd. Ghostty's config forwards Cmd-Z and Cmd-Shift-Z to Neovim.",
+    "Other Cmd bindings need a GUI client or explicit terminal forwarding.",
     "",
   }
 
@@ -229,28 +311,7 @@ end
 -- ── output ──────────────────────────────────────────────────────────────────
 
 local function show_float(lines)
-  local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-  vim.bo[buf].filetype = "markdown"
-  vim.bo[buf].modifiable = false
-  vim.bo[buf].bufhidden = "wipe"
-
-  local width = math.min(vim.o.columns - 4, 120)
-  local height = math.min(vim.o.lines - 6, #lines + 2)
-  local win = vim.api.nvim_open_win(buf, true, {
-    relative = "editor",
-    width = width,
-    height = height,
-    row = math.floor((vim.o.lines - height) / 2) - 1,
-    col = math.floor((vim.o.columns - width) / 2),
-    style = "minimal",
-    border = "rounded",
-    title = " keymaps ",
-    title_pos = "center",
-  })
-  vim.wo[win].wrap = false
-  vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, nowait = true })
-  vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, nowait = true })
+  return require("ui.keymap_preview").open(lines)
 end
 
 --- docs/KEYMAPS.md inside the dotfiles repo when nvim's config is stowed from it,
@@ -268,6 +329,15 @@ end
 
 function M.register_commands()
   local keymaps = require "keymaps"
+
+  for _, name in ipairs { "Cheatsheet", "NvCheatsheet" } do
+    vim.api.nvim_create_user_command(name, function(args)
+      require("ui.cheatsheet").toggle(args.args ~= "" and args.args or nil)
+    end, {
+      nargs = "?", desc = "Toggle the grouped terminal cheatsheet",
+      complete = function() return keymaps.available() end,
+    })
+  end
 
   vim.api.nvim_create_user_command("Keymaps", function(args)
     local preset = args.args ~= "" and args.args or keymaps.preset_name()
