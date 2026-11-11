@@ -1,24 +1,5 @@
-dofile(vim.g.base46_cache .. "mason")
-
+-- Mason manages binaries only. Install tools explicitly with :MasonInstall.
 return {
-  { "mason-org/mason.nvim", version = "^1.0.0" },
-  { "mason-org/mason-lspconfig.nvim", version = "^1.0.0" },
-  PATH = "skip",
-
-  ui = {
-    icons = {
-      package_pending = " ",
-      package_installed = " ",
-      package_uninstalled = " ",
-    },
-  },
-  ensure_installed = {
-    "lua_ls",
-    "gopls",
-    "ruff",
-    "pyright",
-    "stylua",
-  },
-  automatic_installation = true,
-  max_concurrent_installers = 10,
+  PATH = "prepend",
+  max_concurrent_installers = 4,
 }

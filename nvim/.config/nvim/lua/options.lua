@@ -1,15 +1,26 @@
+-- Editor defaults only; plugins and colors are configured elsewhere.
 local opt = vim.opt
 local o = vim.o
 local g = vim.g
 
+-- Disable netrw before runtime plugins load; NvimTree is opened on demand.
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
+
 -------------------------------------- options ------------------------------------------
 o.laststatus = 3
 o.showmode = false
+o.termguicolors = true
+o.completeopt = "menu,menuone,noselect"
 o.splitkeep = "screen"
 
 o.clipboard = "unnamedplus"
 o.cursorline = true
-o.cursorlineopt = "number"
+o.cursorlineopt = "both"
+-- Blink in every mode while retaining the insert-mode bar.
+o.guicursor = "n-v-c:block-blinkwait700-blinkoff400-blinkon250,i-ci-ve:ver25-blinkwait700-blinkoff400-blinkon250,r-cr:hor20-blinkwait700-blinkoff400-blinkon250,o:hor50-blinkwait700-blinkoff400-blinkon250"
+o.hlsearch = true
+o.incsearch = true
 
 -- Indenting
 o.expandtab = true

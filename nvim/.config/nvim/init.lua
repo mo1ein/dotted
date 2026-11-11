@@ -1,176 +1,31 @@
-vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
+-- Startup order only; each concern owns its own settings and lifecycle.
+if vim.fn.has "nvim-0.12" == 0 then
+  error "This configuration requires Neovim 0.12+ (current stable)."
+end
 vim.g.mapleader = " "
-
-local autocmd = vim.api.nvim_create_autocmd
-
-local ui_caches = { "blankline", "cmp", "devicons", "git", "lsp", "mason", "nvcheatsheet", "nvimtree", "statusline", "tbline", "telescope", "term", "whichkey" }
-
-local function apply()
-  local ok, utils = pcall(require, "jb.utils")
-  if not ok then
-    return
-  end
-  local jb_init = require "jb"
-  local config = require "jb.config"
-  local opts = config.extend()
-  local profile = vim.o.background
-  local colors = utils.read_colors "/lua/jb/intellij-palette.json"
-  local highlights = utils.read_highlights "/lua/jb/highlights.json"
-
-  vim.g.colors_name = "onedark"
-
-  if vim.g.base46_cache then
-    pcall(dofile, vim.g.base46_cache .. "defaults")
-  end
-
-  for _, name in ipairs(ui_caches) do
-    if vim.g.base46_cache then
-      local f = vim.g.base46_cache .. name
-      if vim.fn.filereadable(f) == 1 then
-        pcall(dofile, f)
-      end
-    end
-  end
-
-  local hl_groups = {}
-  local set_hl_delayed = {}
-
-  for section, groups in pairs(highlights) do
-    if section == "Builtin.Languages" or section == "Builtin.Diagnostic" or section:match("^Treesitter%.") or section:match("^Syntax%.") or section:match("^Semantic%.") then
-      for group, attrs in pairs(groups) do
-        local hl = {}
-
-        if type(attrs) == "string" and string.find(attrs, "|") ~= nil then
-          local props = utils.get_hl_props(colors, attrs, profile)
-          if group == props.name then
-            hl = props.hl
-          else
-            if hl_groups[props.name] == nil then
-              vim.api.nvim_set_hl(0, props.name, jb_init.disable_hl_args(props.hl, opts))
-              hl_groups[props.name] = true
-            end
-            hl.link = props.name
-          end
-        elseif type(attrs) == "string" and attrs ~= "" then
-          hl.link = attrs
-          set_hl_delayed[group] = hl
-        elseif type(attrs) == "table" then
-          local last_hl_name = nil
-          for attr, value in pairs(attrs) do
-            if attr ~= "nolink" then
-              if type(value) == "string" and string.find(value, "|") ~= nil then
-                last_hl_name = string.gsub(value, "|", "_")
-                local props = utils.get_hl_props(colors, value, profile)
-                hl[attr] = props.prop or props.hl[attr]
-              else
-                hl[attr] = value
-              end
-            end
-          end
-
-          local group_name = (utils.table_length(attrs) == 1 and last_hl_name ~= nil)
-            and last_hl_name .. "-" .. last_hl_name
-            or group .. "_Custom"
-
-          local nolink = attrs.nolink
-          if not nolink then
-            vim.api.nvim_set_hl(0, group_name, jb_init.disable_hl_args(hl, opts))
-            hl.link = group_name
-          else
-            vim.api.nvim_set_hl(0, group, jb_init.disable_hl_args(hl, opts))
-          end
-        end
-
-        if attrs ~= nil and attrs ~= "" then
-          local props = hl.link ~= nil and { link = hl.link } or hl
-          vim.api.nvim_set_hl(0, group, jb_init.disable_hl_args(props, opts))
-        end
-      end
-    end
-  end
-
-  for group, hl in pairs(set_hl_delayed) do
-    local props = hl.link ~= nil and { link = hl.link } or hl
-    vim.api.nvim_set_hl(0, group, jb_init.disable_hl_args(props, opts))
-  end
-
-  vim.g.colors_name = "jb"
-end
-
--- bootstrap lazy and all plugins
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-
-if not vim.uv.fs_stat(lazypath) then
-  local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
-end
-
-vim.opt.rtp:prepend(lazypath)
-
-local lazy_config = require "configs.lazy"
-
-require("lazy").setup({
-  { import = "plugins" },
-}, lazy_config)
+vim.g.maplocalleader = ","
 
 require "options"
-
-vim.schedule(function()
-  require("keymaps").setup()
-end)
-
-local function set_transparent()
-  local groups = {
-    "Normal", "NormalNC",
-    "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeCursorLine", "NvimTreeWinSeparator",
-  }
-  for _, g in ipairs(groups) do
-    vim.api.nvim_set_hl(0, g, { bg = "NONE" })
-  end
+require("autocmds").setup()
+require("ui.buffers").setup()
+require("ui.switcher").setup()
+if require("config.ui").breadcrumbs then
+  require("ui.breadcrumbs").setup()
 end
-
-vim.api.nvim_create_autocmd("VimEnter", {
-  once = true,
-  callback = function()
-    vim.schedule(function()
-      apply()
-      set_transparent()
-    end)
-  end,
-})
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = function()
-    if vim.g.colors_name ~= "jb" then
-      apply()
-    end
-    set_transparent()
-  end,
-})
-
-vim.api.nvim_create_autocmd("User", {
-  pattern = "FilePost",
-  once = true,
-  callback = function()
-    vim.schedule(function()
-      apply()
-      set_transparent()
-    end)
-  end,
-})
-
-vim.api.nvim_create_autocmd("User", {
-  pattern = "VeryLazy",
-  once = true,
-  callback = function()
-    apply()
-    set_transparent()
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "NvimTree",
-  callback = function()
-    set_transparent()
-  end,
-})
+require("ui.statusline").setup()
+if require("config.ui").bufferline then
+  require("ui.bufferline").setup()
+end
+if require("config.ui").dashboard then
+  require("ui.dashboard").setup()
+end
+if require("config.ui").tools.enabled then
+  require("ui.tools").setup()
+end
+require("ui.transparency").setup()
+require("config.highlights").setup()
+require("ui.breadcrumb_colors").setup()
+require("keymaps").setup()
+require("ui.replace").setup()
+require("config.theme_loader").setup()
+require("config.lazy").setup()

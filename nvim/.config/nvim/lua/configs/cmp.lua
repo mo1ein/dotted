@@ -1,12 +1,13 @@
-dofile(vim.g.base46_cache .. "cmp")
+-- Completion behavior and popup styling, independent of the active theme.
 
 local cmp = require "cmp"
 
 local options = {
   completion = { completeopt = "menu,menuone" },
 
-  experimental = {
-    ghost_text = true
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
   },
 
   snippet = {
@@ -54,8 +55,8 @@ local options = {
     { name = "luasnip" },
     { name = "buffer" },
     { name = "nvim_lua" },
-    { name = "async_path" },
+    { name = "path" },
   },
 }
 
-return vim.tbl_deep_extend("force", options, require "nvchad.cmp")
+return options
